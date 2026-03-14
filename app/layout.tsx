@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SITE_NAME, GA_ID } from "@/lib/constants";
 import Script from "next/script";
+import { PostHogProvider } from "@/components/PostHogProvider";
 
 export const metadata: Metadata = {
   title: {
@@ -31,33 +32,35 @@ export default function RootLayout({
             </Script>
           </>
         )}
-        <header className="border-b border-neutral-800">
-          <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="/" className="font-bold text-yellow-400 text-lg">
-              {SITE_NAME}
-            </a>
-            <nav className="flex gap-4 text-sm text-neutral-400">
-              <a href="/photo-resizer" className="hover:text-neutral-200">
-                Photo
+        <PostHogProvider>
+          <header className="border-b border-neutral-800">
+            <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+              <a href="/" className="font-bold text-yellow-400 text-lg">
+                {SITE_NAME}
               </a>
-              <a href="/signature-resizer" className="hover:text-neutral-200">
-                Signature
-              </a>
-            </nav>
-          </div>
-        </header>
+              <nav className="flex gap-4 text-sm text-neutral-400">
+                <a href="/photo-resizer" className="hover:text-neutral-200">
+                  Photo
+                </a>
+                <a href="/signature-resizer" className="hover:text-neutral-200">
+                  Signature
+                </a>
+              </nav>
+            </div>
+          </header>
 
-        <main className="max-w-2xl mx-auto px-4 py-6">{children}</main>
+          <main className="max-w-2xl mx-auto px-4 py-6">{children}</main>
 
-        <footer className="border-t border-neutral-800 mt-12">
-          <div className="max-w-2xl mx-auto px-4 py-6 text-center text-neutral-600 text-xs space-y-2">
-            <p>
-              All processing happens in your browser. We never see or store your
-              photos.
-            </p>
-            <p>&copy; {new Date().getFullYear()} {SITE_NAME}</p>
-          </div>
-        </footer>
+          <footer className="border-t border-neutral-800 mt-12">
+            <div className="max-w-2xl mx-auto px-4 py-6 text-center text-neutral-600 text-xs space-y-2">
+              <p>
+                All processing happens in your browser. We never see or store your
+                photos.
+              </p>
+              <p>&copy; {new Date().getFullYear()} {SITE_NAME}</p>
+            </div>
+          </footer>
+        </PostHogProvider>
       </body>
     </html>
   );
