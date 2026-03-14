@@ -72,6 +72,7 @@ async function processImage(
     bgColor: string | null;
     signatureMode?: boolean;
     dateStamp?: { name: string; date: string };
+    cropBiasY?: number;
   }
 ) {
   const inputBuf = fs.readFileSync(inputPath);
@@ -96,8 +97,9 @@ async function processImage(
       sigma = 1.2; m1 = 1.4; m2 = 14;
     }
 
+    const cropPosition = (opts.cropBiasY ?? 0.2) <= 0.25 ? "north" : "centre";
     processedBuf = await sharp(inputBuf)
-      .resize(opts.targetWidth, opts.targetHeight, { fit: "cover", position: "north" })
+      .resize(opts.targetWidth, opts.targetHeight, { fit: "cover", position: cropPosition })
       .flatten({ background: { r: 255, g: 255, b: 255 } })
       .modulate({ brightness: 1.02, saturation: 1.05 })
       .sharpen({ sigma, m1, m2 })
@@ -248,5 +250,46 @@ describe("imageEngine", () => {
     expect(r.height).toBe(230);
 
     fs.unlinkSync(tmpPath);
+  });
+
+  test("Photo crop bias changes top-vs-center crop composition", async () => {
+    const w = 400;
+    const h = 900;
+    const channels = 3;
+    const data = Buffer.alloc(w * h * channels);
+    for (let y = 0; y < h; y++) {
+      const t = y / (h - 1); // 0 top, 1 bottom
+      const r = Math.round(255 * (1 - t));
+      const b = Math.round(255 * t);
+      for (let x = 0; x < w; x++) {
+        const i = (y * w + x) * channels;
+        data[i] = r;
+        data[i + 1] = 0;
+        data[i + 2] = b;
+      }
+    }
+
+    const gradientPath = path.join(__dirname, "../test-output/gradient_tall_test.jpg");
+    if (!fs.existsSync(path.dirname(gradientPath))) fs.mkdirSync(path.dirname(gradientPath), { recursive: true });
+    await sharp(data, { raw: { width: w, height: h, channels } }).jpeg({ quality: 95 }).toFile(gradientPath);
+
+    const topBiased = await processImage(gradientPath, {
+      targetWidth: 100, targetHeight: 120, minKB: 1, maxKB: 50,
+      bgColor: "#FFFFFF", cropBiasY: 0.0,
+    });
+    const centered = await processImage(gradientPath, {
+      targetWidth: 100, targetHeight: 120, minKB: 1, maxKB: 50,
+      bgColor: "#FFFFFF", cropBiasY: 0.5,
+    });
+
+    const topStats = await sharp(topBiased.buffer).stats();
+    const centerStats = await sharp(centered.buffer).stats();
+    const topRedMean = topStats.channels[0].mean;
+    const centerRedMean = centerStats.channels[0].mean;
+
+    // Top-biased crop keeps more upper red region than centered crop.
+    expect(topRedMean).toBeGreaterThan(centerRedMean);
+
+    fs.unlinkSync(gradientPath);
   });
 });

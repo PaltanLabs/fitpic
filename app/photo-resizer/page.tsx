@@ -11,6 +11,12 @@ import PhotoFramingControls from "@/components/PhotoFramingControls";
 import { type ExamPreset } from "@/lib/presets";
 import { processImage, type ProcessResult } from "@/lib/imageEngine";
 import { makeWhiteBackground } from "@/lib/whiteBackground";
+import { preparePhotoSourceImage } from "@/lib/photoSource";
+import {
+  DEFAULT_CROP_BIAS_Y,
+  getPhotoToolCategoryResetState,
+  getPhotoToolPresetState,
+} from "@/lib/photoToolState";
 
 export default function PhotoResizerPage() {
   const [preset, setPreset] = useState<ExamPreset | null>(null);
@@ -22,7 +28,7 @@ export default function PhotoResizerPage() {
   const [dateStamp, setDateStamp] = useState<
     { name: string; date: string } | undefined
   >();
-  const [cropBiasY, setCropBiasY] = useState(0.2);
+  const [cropBiasY, setCropBiasY] = useState(DEFAULT_CROP_BIAS_Y);
   const [whiteBackgroundMode, setWhiteBackgroundMode] = useState(false);
   const [whiteBgError, setWhiteBgError] = useState<string | null>(null);
   const [whiteBgDurationMs, setWhiteBgDurationMs] = useState<number | null>(null);
@@ -46,23 +52,18 @@ export default function PhotoResizerPage() {
     setWhiteBgError(null);
     setWhiteBgDurationMs(null);
     try {
-      let sourceImage = image;
-      if (whiteBackgroundMode) {
-        try {
-          const processed = await makeWhiteBackground(image);
-          sourceImage = processed.image;
-          setWhiteBgDurationMs(processed.durationMs);
-        } catch (err) {
-          setWhiteBgError(
-            err instanceof Error
-              ? err.message
-              : "White background conversion failed. Try a clearer headshot with better lighting."
-          );
-          return;
-        }
+      const prepared = await preparePhotoSourceImage({
+        image,
+        whiteBackgroundMode,
+        makeWhiteBackgroundFn: makeWhiteBackground,
+      });
+      if (prepared.whiteBgError) {
+        setWhiteBgError(prepared.whiteBgError);
+        return;
       }
+      setWhiteBgDurationMs(prepared.whiteBgDurationMs);
 
-      const res = await processImage(sourceImage, {
+      const res = await processImage(prepared.sourceImage, {
         targetWidth: preset.width,
         targetHeight: preset.height,
         minKB: preset.minKB,
@@ -106,24 +107,26 @@ export default function PhotoResizerPage() {
         onCategoryChange={() => {
           clearUploadState();
           setPreset(null);
-          setDateStampEnabled(false);
-          setDateStamp(undefined);
-          setCropBiasY(0.2);
-          setWhiteBackgroundMode(false);
-          setWhiteBgError(null);
-          setWhiteBgDurationMs(null);
+          const reset = getPhotoToolCategoryResetState();
+          setDateStampEnabled(reset.dateStampEnabled);
+          setDateStamp(reset.dateStamp);
+          setCropBiasY(reset.cropBiasY);
+          setWhiteBackgroundMode(reset.whiteBackgroundMode);
+          setWhiteBgError(reset.whiteBgError);
+          setWhiteBgDurationMs(reset.whiteBgDurationMs);
           setUploaderKey((k) => k + 1);
           setDateStamperKey((k) => k + 1);
         }}
         onSelect={(p) => {
           clearUploadState();
           setPreset(p);
-          setDateStampEnabled(p.requiresDateStamp);
-          setDateStamp(undefined);
-          setCropBiasY(0.2);
-          setWhiteBackgroundMode(false);
-          setWhiteBgError(null);
-          setWhiteBgDurationMs(null);
+          const next = getPhotoToolPresetState(p.requiresDateStamp);
+          setDateStampEnabled(next.dateStampEnabled);
+          setDateStamp(next.dateStamp);
+          setCropBiasY(next.cropBiasY);
+          setWhiteBackgroundMode(next.whiteBackgroundMode);
+          setWhiteBgError(next.whiteBgError);
+          setWhiteBgDurationMs(next.whiteBgDurationMs);
           setUploaderKey((k) => k + 1);
           setDateStamperKey((k) => k + 1);
         }}
