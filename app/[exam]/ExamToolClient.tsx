@@ -9,6 +9,11 @@ import AdSlot from "@/components/AdSlot";
 import PhotoFramingControls from "@/components/PhotoFramingControls";
 import { processImage, type ProcessResult } from "@/lib/imageEngine";
 import { makeWhiteBackground } from "@/lib/whiteBackground";
+import { preparePhotoSourceImage } from "@/lib/photoSource";
+import {
+  DEFAULT_CROP_BIAS_Y,
+  getPhotoToolPresetState,
+} from "@/lib/photoToolState";
 
 interface Props {
   presetId: string;
@@ -22,7 +27,7 @@ export default function ExamToolClient({ presetId }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [dateStampEnabled, setDateStampEnabled] = useState(preset.requiresDateStamp);
   const [dateStamp, setDateStamp] = useState<{ name: string; date: string } | undefined>();
-  const [cropBiasY, setCropBiasY] = useState(0.2);
+  const [cropBiasY, setCropBiasY] = useState(DEFAULT_CROP_BIAS_Y);
   const [whiteBackgroundMode, setWhiteBackgroundMode] = useState(false);
   const [whiteBgError, setWhiteBgError] = useState<string | null>(null);
   const [whiteBgDurationMs, setWhiteBgDurationMs] = useState<number | null>(null);
@@ -43,23 +48,25 @@ export default function ExamToolClient({ presetId }: Props) {
     setWhiteBgError(null);
     setWhiteBgDurationMs(null);
     try {
-      let sourceImage = image;
-      if (!isSignature && whiteBackgroundMode) {
-        try {
-          const processed = await makeWhiteBackground(image);
-          sourceImage = processed.image;
-          setWhiteBgDurationMs(processed.durationMs);
-        } catch (err) {
-          setWhiteBgError(
-            err instanceof Error
-              ? err.message
-              : "White background conversion failed. Try a clearer headshot with better lighting."
-          );
-          return;
-        }
-      }
+      const prepared = isSignature
+        ? {
+            sourceImage: image,
+            whiteBgError: null,
+            whiteBgDurationMs: null,
+          }
+        : await preparePhotoSourceImage({
+            image,
+            whiteBackgroundMode,
+            makeWhiteBackgroundFn: makeWhiteBackground,
+          });
 
-      const res = await processImage(sourceImage, {
+      if (prepared.whiteBgError) {
+        setWhiteBgError(prepared.whiteBgError);
+        return;
+      }
+      setWhiteBgDurationMs(prepared.whiteBgDurationMs);
+
+      const res = await processImage(prepared.sourceImage, {
         targetWidth: preset.width,
         targetHeight: preset.height,
         minKB: preset.minKB,
@@ -80,6 +87,11 @@ export default function ExamToolClient({ presetId }: Props) {
     setResult(null);
     setImage(null);
     setFile(null);
+    const next = getPhotoToolPresetState(preset.requiresDateStamp);
+    setCropBiasY(next.cropBiasY);
+    setWhiteBackgroundMode(next.whiteBackgroundMode);
+    setWhiteBgError(next.whiteBgError);
+    setWhiteBgDurationMs(next.whiteBgDurationMs);
   };
 
   return (
