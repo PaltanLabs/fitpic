@@ -25,6 +25,8 @@ export interface ProcessOptions {
     date: string;
   };
   signatureMode?: boolean;
+  // For photo crops only: 0 = crop from top, 0.5 = center crop.
+  cropBiasY?: number;
 }
 
 export interface ProcessResult {
@@ -51,7 +53,8 @@ function makeCanvas(w: number, h: number): HTMLCanvasElement {
  */
 function drawPhotoCropped(
   img: HTMLImageElement,
-  targetAspect: number
+  targetAspect: number,
+  cropBiasY = 0.2
 ): HTMLCanvasElement {
   const srcW = img.naturalWidth || img.width;
   const srcH = img.naturalHeight || img.height;
@@ -66,8 +69,9 @@ function drawPhotoCropped(
   } else {
     // Source taller — crop bottom (keep head at top)
     cropH = Math.round(srcW / targetAspect);
-    // Top-biased: only crop 20% from top, rest from bottom
-    cropY = Math.round((srcH - cropH) * 0.20);
+    // Clamp to safe range: [0, 0.5] where 0 is top-biased and 0.5 is centered.
+    const bias = Math.max(0, Math.min(0.5, cropBiasY));
+    cropY = Math.round((srcH - cropH) * bias);
   }
 
   const c = makeCanvas(cropW, cropH);
@@ -277,6 +281,7 @@ function blobToDataUrl(blob: Blob): Promise<string> {
   });
 }
 
+
 /**
  * Main image processing function.
  */
@@ -284,7 +289,16 @@ export async function processImage(
   sourceImage: HTMLImageElement,
   options: ProcessOptions
 ): Promise<ProcessResult> {
-  const { targetWidth, targetHeight, minKB, maxKB, format, dateStamp, signatureMode } = options;
+  const {
+    targetWidth,
+    targetHeight,
+    minKB,
+    maxKB,
+    format,
+    dateStamp,
+    signatureMode,
+    cropBiasY,
+  } = options;
 
   const stampHeight = dateStamp
     ? Math.max(16, Math.round(targetHeight * 0.12))
@@ -330,7 +344,7 @@ export async function processImage(
     // === PHOTO PIPELINE ===
     // 1. Top-biased crop at source resolution
     const targetAspect = targetWidth / targetHeight;
-    const srcCanvas = drawPhotoCropped(sourceImage, targetAspect);
+    const srcCanvas = drawPhotoCropped(sourceImage, targetAspect, cropBiasY);
     flattenToWhite(srcCanvas);
 
     // 2. Multi-pass resize with adaptive unsharp based on downscale ratio

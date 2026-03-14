@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:reset": "bash scripts/dev-reset.sh",
     "build": "next build",
     "start": "next start",
     "test": "jest --config jest.config.js",
@@ -11,6 +12,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mediapipe/selfie_segmentation": "^0.1.1675465747",
+    "@tensorflow-models/body-segmentation": "^1.0.2",
     "next": "^14.2.15",
     "pica": "^9.0.1",
     "react": "^18.3.1",

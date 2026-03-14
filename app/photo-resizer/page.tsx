@@ -7,8 +7,10 @@ import ResultPreview from "@/components/ResultPreview";
 import DateStamper from "@/components/DateStamper";
 import AdSlot from "@/components/AdSlot";
 import Tips from "@/components/Tips";
+import PhotoFramingControls from "@/components/PhotoFramingControls";
 import { type ExamPreset } from "@/lib/presets";
 import { processImage, type ProcessResult } from "@/lib/imageEngine";
+import { makeWhiteBackground } from "@/lib/whiteBackground";
 
 export default function PhotoResizerPage() {
   const [preset, setPreset] = useState<ExamPreset | null>(null);
@@ -20,6 +22,10 @@ export default function PhotoResizerPage() {
   const [dateStamp, setDateStamp] = useState<
     { name: string; date: string } | undefined
   >();
+  const [cropBiasY, setCropBiasY] = useState(0.2);
+  const [whiteBackgroundMode, setWhiteBackgroundMode] = useState(false);
+  const [whiteBgError, setWhiteBgError] = useState<string | null>(null);
+  const [whiteBgDurationMs, setWhiteBgDurationMs] = useState<number | null>(null);
   const [result, setResult] = useState<ProcessResult | null>(null);
   const [processing, setProcessing] = useState(false);
 
@@ -28,6 +34,8 @@ export default function PhotoResizerPage() {
       setImage(img);
       setFile(f);
       setResult(null);
+      setWhiteBgError(null);
+      setWhiteBgDurationMs(null);
     },
     []
   );
@@ -35,8 +43,26 @@ export default function PhotoResizerPage() {
   const handleResize = async () => {
     if (!preset || !image) return;
     setProcessing(true);
+    setWhiteBgError(null);
+    setWhiteBgDurationMs(null);
     try {
-      const res = await processImage(image, {
+      let sourceImage = image;
+      if (whiteBackgroundMode) {
+        try {
+          const processed = await makeWhiteBackground(image);
+          sourceImage = processed.image;
+          setWhiteBgDurationMs(processed.durationMs);
+        } catch (err) {
+          setWhiteBgError(
+            err instanceof Error
+              ? err.message
+              : "White background conversion failed. Try a clearer headshot with better lighting."
+          );
+          return;
+        }
+      }
+
+      const res = await processImage(sourceImage, {
         targetWidth: preset.width,
         targetHeight: preset.height,
         minKB: preset.minKB,
@@ -45,6 +71,7 @@ export default function PhotoResizerPage() {
         format: preset.format,
         dateStamp: dateStampEnabled ? dateStamp : undefined,
         signatureMode: false,
+        cropBiasY,
       });
       setResult(res);
     } finally {
@@ -81,6 +108,10 @@ export default function PhotoResizerPage() {
           setPreset(null);
           setDateStampEnabled(false);
           setDateStamp(undefined);
+          setCropBiasY(0.2);
+          setWhiteBackgroundMode(false);
+          setWhiteBgError(null);
+          setWhiteBgDurationMs(null);
           setUploaderKey((k) => k + 1);
           setDateStamperKey((k) => k + 1);
         }}
@@ -89,6 +120,10 @@ export default function PhotoResizerPage() {
           setPreset(p);
           setDateStampEnabled(p.requiresDateStamp);
           setDateStamp(undefined);
+          setCropBiasY(0.2);
+          setWhiteBackgroundMode(false);
+          setWhiteBgError(null);
+          setWhiteBgDurationMs(null);
           setUploaderKey((k) => k + 1);
           setDateStamperKey((k) => k + 1);
         }}
@@ -120,6 +155,22 @@ export default function PhotoResizerPage() {
       {/* Step 3: Resize */}
       {preset && image && !result && (
         <div className="space-y-3">
+          <PhotoFramingControls
+            cropBiasY={cropBiasY}
+            onCropBiasYChange={setCropBiasY}
+            whiteBackgroundMode={whiteBackgroundMode}
+            onWhiteBackgroundModeChange={setWhiteBackgroundMode}
+          />
+          {whiteBgError && (
+            <div className="bg-rose-400/10 border border-rose-400/30 text-rose-300 text-xs rounded-xl p-3">
+              {whiteBgError}
+            </div>
+          )}
+          {!whiteBgError && whiteBackgroundMode && whiteBgDurationMs !== null && (
+            <div className="bg-emerald-400/10 border border-emerald-400/30 text-emerald-300 text-xs rounded-xl p-3">
+              White background applied in {(whiteBgDurationMs / 1000).toFixed(2)}s.
+            </div>
+          )}
           <div className="bg-neutral-900 rounded-xl p-4 text-sm text-neutral-400">
             <p>
               Target: <span className="text-neutral-200">{preset.width}x{preset.height}px</span> |{" "}
