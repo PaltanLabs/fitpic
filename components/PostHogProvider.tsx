@@ -5,7 +5,7 @@ import { PostHogProvider as PHProvider } from "posthog-js/react";
 import { useEffect, Component, type ReactNode, type ErrorInfo } from "react";
 
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY || "";
-const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
+const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "/ingest";
 
 // Catches React render errors
 class ErrorBoundary extends Component<
