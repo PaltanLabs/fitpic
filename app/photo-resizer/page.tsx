@@ -1,68 +1,35 @@
-"use client";
+import type { Metadata } from "next";
+import { SITE_NAME } from "@/lib/constants";
+import { PRESETS, getPresetSlug } from "@/lib/presets";
+import PhotoResizerClient from "./PhotoResizerClient";
 
-import { useState, useCallback } from "react";
-import ExamPresetSelector from "@/components/ExamPresetSelector";
-import ImageUploader from "@/components/ImageUploader";
-import ResultPreview from "@/components/ResultPreview";
-import DateStamper from "@/components/DateStamper";
-import AdSlot from "@/components/AdSlot";
-import Tips from "@/components/Tips";
-import { type ExamPreset } from "@/lib/presets";
-import { processImage, type ProcessResult } from "@/lib/imageEngine";
+export const metadata: Metadata = {
+  title: `Photo Resizer for Govt Exams — Resize to Exact KB & Pixels Free | ${SITE_NAME}`,
+  description:
+    "Free online photo resizer for SSC, UPSC, IBPS, Railway, NEET, PAN, Aadhaar, Passport. Auto-compress to exact KB and pixel size. 100% browser-based, no signup.",
+  keywords:
+    "photo resizer, resize photo for exam, compress photo to 50kb, passport photo resizer, exam photo resize online free",
+  alternates: { canonical: "/photo-resizer" },
+  openGraph: {
+    title: `Photo Resizer for Govt Exams — Resize to Exact KB & Pixels Free | ${SITE_NAME}`,
+    description:
+      "Free online photo resizer for SSC, UPSC, IBPS, Railway, NEET, PAN, Aadhaar, Passport. Auto-compress to exact KB and pixel size. 100% browser-based, no signup.",
+    type: "website",
+    siteName: SITE_NAME,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Photo Resizer for Govt Exams | ${SITE_NAME}`,
+    description:
+      "Free online photo resizer for SSC, UPSC, IBPS, Railway, NEET, PAN, Aadhaar, Passport.",
+  },
+};
+
+const photoPresets = PRESETS.filter(
+  (p) => (p.type === "photo" || p.type === "thumb") && p.id !== "custom"
+);
 
 export default function PhotoResizerPage() {
-  const [preset, setPreset] = useState<ExamPreset | null>(null);
-  const [image, setImage] = useState<HTMLImageElement | null>(null);
-  const [file, setFile] = useState<File | null>(null);
-  const [uploaderKey, setUploaderKey] = useState(0);
-  const [dateStamperKey, setDateStamperKey] = useState(0);
-  const [dateStampEnabled, setDateStampEnabled] = useState(false);
-  const [dateStamp, setDateStamp] = useState<
-    { name: string; date: string } | undefined
-  >();
-  const [result, setResult] = useState<ProcessResult | null>(null);
-  const [processing, setProcessing] = useState(false);
-
-  const handleImageLoad = useCallback(
-    (img: HTMLImageElement, f: File) => {
-      setImage(img);
-      setFile(f);
-      setResult(null);
-    },
-    []
-  );
-
-  const handleResize = async () => {
-    if (!preset || !image) return;
-    setProcessing(true);
-    try {
-      const res = await processImage(image, {
-        targetWidth: preset.width,
-        targetHeight: preset.height,
-        minKB: preset.minKB,
-        maxKB: preset.maxKB,
-        bgColor: preset.bgColor,
-        format: preset.format,
-        dateStamp: dateStampEnabled ? dateStamp : undefined,
-        signatureMode: false,
-      });
-      setResult(res);
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  const clearUploadState = () => {
-    setResult(null);
-    setImage(null);
-    setFile(null);
-  };
-
-  const reset = () => {
-    clearUploadState();
-    setUploaderKey((k) => k + 1);
-  };
-
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Photo Resizer</h1>
@@ -70,101 +37,25 @@ export default function PhotoResizerPage() {
         Resize your photo to exact exam specifications. 100% client-side.
       </p>
 
-      <AdSlot slot="photo-top" format="horizontal" />
+      <PhotoResizerClient />
 
-      {/* Step 1: Select Exam */}
-      <ExamPresetSelector
-        type="photo"
-        selectedPreset={preset}
-        onCategoryChange={() => {
-          clearUploadState();
-          setPreset(null);
-          setDateStampEnabled(false);
-          setDateStamp(undefined);
-          setUploaderKey((k) => k + 1);
-          setDateStamperKey((k) => k + 1);
-        }}
-        onSelect={(p) => {
-          clearUploadState();
-          setPreset(p);
-          setDateStampEnabled(p.requiresDateStamp);
-          setDateStamp(undefined);
-          setUploaderKey((k) => k + 1);
-          setDateStamperKey((k) => k + 1);
-        }}
-      />
-
-      {/* Step 2: Upload */}
-      {preset && (
-        <>
-          <ImageUploader
-            key={`${preset.id}-${uploaderKey}`}
-            onImageLoad={handleImageLoad}
-            label="Upload Photo"
-          />
-
-          {/* Date stamp */}
-          {preset.requiresDateStamp && (
-            <DateStamper
-              key={`${preset.id}-${dateStamperKey}`}
-              enabled={dateStampEnabled}
-              onToggle={setDateStampEnabled}
-              onStampChange={setDateStamp}
-            />
-          )}
-        </>
-      )}
-
-      <AdSlot slot="photo-mid" format="rectangle" className="my-4" />
-
-      {/* Step 3: Resize */}
-      {preset && image && !result && (
-        <div className="space-y-3">
-          <div className="bg-neutral-900 rounded-xl p-4 text-sm text-neutral-400">
-            <p>
-              Target: <span className="text-neutral-200">{preset.width}x{preset.height}px</span> |{" "}
-              <span className="text-neutral-200">{preset.minKB}-{preset.maxKB}KB</span> |{" "}
-              <span className="text-neutral-200">{preset.format.toUpperCase()}</span>
-              {preset.bgColor && (
-                <> | <span className="text-neutral-200">White BG</span></>
-              )}
-            </p>
-          </div>
-
-          <button
-            onClick={handleResize}
-            disabled={processing}
-            className="w-full py-3 rounded-xl bg-yellow-400 text-neutral-900 font-bold text-center hover:bg-yellow-300 transition-colors disabled:opacity-50"
-          >
-            {processing ? "Processing..." : "Resize & Compress Now"}
-          </button>
+      {/* Popular Exams — server-rendered for SEO */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-bold text-neutral-300">
+          Popular Photo Presets
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          {photoPresets.map((p) => (
+            <a
+              key={p.id}
+              href={`/${getPresetSlug(p)}`}
+              className="px-3 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 text-xs hover:border-neutral-600"
+            >
+              {p.name}
+            </a>
+          ))}
         </div>
-      )}
-
-      {/* Step 4: Result */}
-      {result && preset && file && (
-        <>
-          <ResultPreview result={result} preset={preset} originalSize={file.size} />
-
-          <button
-            onClick={reset}
-            className="w-full py-2 rounded-xl border border-neutral-700 text-neutral-400 text-sm hover:border-neutral-500 transition-colors"
-          >
-            Try Another Photo
-          </button>
-
-          <a
-            href="/signature-resizer"
-            className="block text-center text-yellow-400 text-sm hover:underline"
-          >
-            Also need signature? →
-          </a>
-        </>
-      )}
-
-      {preset && <Tips preset={preset} />}
-
-      <AdSlot slot="photo-bottom" format="rectangle" />
+      </div>
     </div>
   );
 }
