@@ -1,12 +1,16 @@
 import { type ExamPreset } from "@/lib/presets";
+import { getPresetSlug } from "@/lib/presets";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 
-interface Props {
-  preset: ExamPreset;
+export function getTypeLabel(type: ExamPreset["type"]): string {
+  if (type === "photo") return "Photo";
+  if (type === "thumb") return "Thumb Impression";
+  return "Signature";
 }
 
 export function generatePresetMetadata(preset: ExamPreset) {
-  const typeLabel = preset.type === "photo" ? "Photo" : "Signature";
+  const typeLabel = getTypeLabel(preset.type);
+  const slug = getPresetSlug(preset);
   const title = `${preset.exam} ${typeLabel} Resizer - Resize to ${preset.maxKB}KB Free Online | ${SITE_NAME}`;
   const description = `Free ${preset.exam} ${typeLabel.toLowerCase()} resizer. Resize to ${preset.width}x${preset.height}px, ${preset.minKB}-${preset.maxKB}KB. ${preset.bgColor ? "White background." : ""} Works on mobile. No signup.`;
 
@@ -14,17 +18,23 @@ export function generatePresetMetadata(preset: ExamPreset) {
     title,
     description,
     keywords: preset.searchKeywords.join(", "),
+    alternates: { canonical: `/${slug}` },
     openGraph: {
       title,
       description,
       type: "website" as const,
       siteName: SITE_NAME,
     },
+    twitter: {
+      card: "summary_large_image" as const,
+      title,
+      description,
+    },
   };
 }
 
 export function generateJsonLd(preset: ExamPreset) {
-  const typeLabel = preset.type === "photo" ? "Photo" : "Signature";
+  const typeLabel = getTypeLabel(preset.type);
   return {
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -38,7 +48,7 @@ export function generateJsonLd(preset: ExamPreset) {
 }
 
 export function generateFaqJsonLd(preset: ExamPreset) {
-  const typeLabel = preset.type === "photo" ? "photo" : "signature";
+  const typeLabel = getTypeLabel(preset.type).toLowerCase();
   const faqs = [
     {
       question: `What is the ${preset.exam} ${typeLabel} size requirement?`,
@@ -73,5 +83,35 @@ export function generateFaqJsonLd(preset: ExamPreset) {
         text: f.answer,
       },
     })),
+  };
+}
+
+export function generateBreadcrumbJsonLd(preset: ExamPreset, slug: string) {
+  const typeLabel = getTypeLabel(preset.type);
+  const parentPath = preset.type === "signature" ? "/signature-resizer" : "/photo-resizer";
+  const parentName = preset.type === "signature" ? "Signature Resizer" : "Photo Resizer";
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: parentName,
+        item: `${SITE_URL}${parentPath}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: `${preset.exam} ${typeLabel} Resizer`,
+      },
+    ],
   };
 }
