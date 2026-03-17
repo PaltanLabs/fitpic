@@ -21,6 +21,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
   },
   manifest: "/manifest.json",
+  verification: {
+    google: "VbDzqbHjZ2pyEsJdRHOOnpvtQy4nRCZl9jSWI7n5MVA",
+  },
 };
 
 export default function RootLayout({
