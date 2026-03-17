@@ -666,7 +666,7 @@ export default function HomePage() {
                         {p.type === "photo"
                           ? "Photo"
                           : p.type === "thumb"
-                          ? "Thumb"
+                          ? "Thumb Impression"
                           : "Signature"}
                       </td>
                       <td className="py-1.5 pr-4 text-neutral-400">
