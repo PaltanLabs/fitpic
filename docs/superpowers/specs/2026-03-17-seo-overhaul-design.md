@@ -71,7 +71,15 @@ app/photo-resizer/PhotoResizerClient.tsx  → existing "use client" component (r
 
 Same pattern for `/signature-resizer` and `/photo-signature-joiner`.
 
+**Important:** The `<h1>` and description text currently inside each client component should be moved to the server wrapper so Google sees them in the initial HTML response. The client component should only contain the interactive tool (preset selector, uploader, result preview).
+
 ### Metadata for each page
+
+**`/` (homepage):**
+- Title: `FitPic — Free Photo & Signature Resizer for Govt Exams | SSC, UPSC, IBPS, NEET`
+- Description: `Free online photo and signature resizer for Indian government exams. SSC, UPSC, IBPS, Railway, NEET, JEE, PAN, Aadhaar, Passport. Resize to exact KB and pixels. 100% browser-based, private, no signup.`
+- Keywords: `photo resizer, signature resizer, exam photo resize, compress photo to kb, govt exam photo size`
+- Canonical: `/`
 
 **`/photo-resizer`:**
 - Title: `Photo Resizer for Govt Exams — Resize to Exact KB & Pixels Free | FitPic`
@@ -92,6 +100,15 @@ Same pattern for `/signature-resizer` and `/photo-signature-joiner`.
 
 Each page should also export `openGraph` metadata with `title`, `description`, `type: "website"`, and `siteName: "FitPic"`.
 
+Additionally, include `twitter` card metadata on all pages:
+```
+twitter: {
+  card: "summary_large_image",
+  title: "...",
+  description: "...",
+}
+```
+
 ---
 
 ## Section 3: Canonical URLs & OpenGraph Image
@@ -100,7 +117,7 @@ Each page should also export `openGraph` metadata with `title`, `description`, `
 
 Add `alternates.canonical` to every page's metadata. This tells Google the definitive URL and prevents duplicate content from query strings or trailing slashes.
 
-**Implementation:** In `layout.tsx` default metadata, set:
+**Implementation:** In `layout.tsx` default metadata, set `metadataBase` as the very first code change (prerequisite for all other metadata — canonical URLs, OG images, and Twitter cards all depend on it):
 ```
 metadataBase: new URL("https://fitpic.in")
 ```
@@ -166,11 +183,12 @@ Data source: derive from the existing `PRESETS` array, grouped by category.
 
 ### Tool Pages → Exam Pages
 
-Add a "Popular Exams" section at the bottom of `/photo-resizer` and `/signature-resizer`:
+Add a "Popular Exams" section at the bottom of `/photo-resizer`, `/signature-resizer`, and `/photo-signature-joiner`:
 - `/photo-resizer`: links to all photo-type exam preset pages
 - `/signature-resizer`: links to all signature-type exam preset pages
+- `/photo-signature-joiner`: links to IBPS and SSC exam pages (the exams that commonly require combined uploads)
 
-These are server-rendered links below the client tool component.
+These are server-rendered links below the client tool component (placed in the server wrapper after Section 2's refactor).
 
 ### Exam Pages → Parent Tool Pages (Breadcrumbs)
 
@@ -181,6 +199,10 @@ Add a breadcrumb trail at the top of each `[exam]` page:
 Or for signature:
 
 > Home > Signature Resizer > SSC Signature Resizer
+
+For "thumb" type presets (e.g., `ibps-sbi-thumb`), the parent is Photo Resizer:
+
+> Home > Photo Resizer > IBPS/SBI Left Thumb Resizer
 
 ### BreadcrumbList JSON-LD
 
@@ -249,24 +271,25 @@ manifest: "/manifest.json"
 ## Implementation Order
 
 1. Section 1 (Search Console) — manual, can be done in parallel with code changes
-2. Section 6a (robots.txt fix) — quick, unblocks crawling
-3. Section 2 (static page metadata) — highest SEO impact code change
-4. Section 3 (canonical URLs + OG image) — depends on metadataBase being set
-5. Section 4 (homepage content) — adds crawlable keyword content
-6. Section 5 (internal linking + breadcrumbs) — strengthens link graph
-7. Section 6b-c (favicon + manifest) — polish
+2. `metadataBase` in `layout.tsx` — prerequisite for all metadata, must come first
+3. Section 6a (robots.txt fix) — quick, unblocks crawling
+4. Section 2 (static page metadata + homepage metadata) — highest SEO impact code change
+5. Section 3 (canonical URLs + OG image + Twitter cards) — builds on metadataBase
+6. Section 4 (homepage content) — adds crawlable keyword content
+7. Section 5 (internal linking + breadcrumbs) — strengthens link graph; depends on Section 2 refactor
+8. Section 6b-c (favicon + manifest) — polish; design assets (OG image, favicon, icons) can be created in parallel with code work
 
 ## Files Changed
 
 - `app/robots.ts` — add disallow rule
-- `app/layout.tsx` — add metadataBase, OG image default, manifest link
+- `app/layout.tsx` — add metadataBase, OG image default, Twitter card default, manifest link
+- `app/page.tsx` — add homepage metadata export, "How It Works" and expanded "Supported Exams" sections
 - `app/photo-resizer/page.tsx` — split into server wrapper + client component
 - `app/photo-resizer/PhotoResizerClient.tsx` — renamed from current page.tsx
 - `app/signature-resizer/page.tsx` — split into server wrapper + client component
 - `app/signature-resizer/SignatureResizerClient.tsx` — renamed
 - `app/photo-signature-joiner/page.tsx` — split into server wrapper + client component
 - `app/photo-signature-joiner/JoinerClient.tsx` — renamed
-- `app/page.tsx` — add "How It Works" and expanded "Supported Exams" sections
 - `app/[exam]/page.tsx` — add breadcrumb UI + BreadcrumbList JSON-LD + canonical URL
 - `components/SEOHead.tsx` — add canonical to generatePresetMetadata, add breadcrumb generator
 - `public/og-image.png` — new static OG image (1200x630)
