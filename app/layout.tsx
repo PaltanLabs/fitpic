@@ -5,12 +5,22 @@ import Script from "next/script";
 import { PostHogProvider } from "@/components/PostHogProvider";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://fitpic.in"),
   title: {
     template: `%s | ${SITE_NAME}`,
     default: `${SITE_NAME} - Free Govt Exam Photo & Signature Resizer`,
   },
   description:
     "Free online photo and signature resizer for Indian government exams. SSC, UPSC, IBPS, Railway, NEET, JEE, PAN, Aadhaar, Passport. 100% browser-based, private.",
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
