@@ -1,9 +1,14 @@
 import { PRESETS, getPresetSlug, type ExamPreset } from "@/lib/presets";
-import { generatePresetMetadata, generateJsonLd, generateFaqJsonLd } from "@/components/SEOHead";
+import {
+  generatePresetMetadata,
+  generateJsonLd,
+  generateFaqJsonLd,
+  generateBreadcrumbJsonLd,
+  getTypeLabel,
+} from "@/components/SEOHead";
 import type { Metadata } from "next";
 import ExamToolClient from "./ExamToolClient";
 
-// Generate all exam preset pages at build time
 export function generateStaticParams() {
   return PRESETS.filter((p) => p.id !== "custom").map((p) => ({
     exam: getPresetSlug(p),
@@ -40,9 +45,13 @@ export default function ExamPage({ params }: { params: { exam: string } }) {
     );
   }
 
-  const typeLabel = preset.type === "photo" ? "Photo" : "Signature";
+  const typeLabel = getTypeLabel(preset.type);
+  const slug = getPresetSlug(preset);
   const jsonLd = generateJsonLd(preset);
   const faqJsonLd = generateFaqJsonLd(preset);
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd(preset, slug);
+  const parentPath = preset.type === "signature" ? "/signature-resizer" : "/photo-resizer";
+  const parentName = preset.type === "signature" ? "Signature Resizer" : "Photo Resizer";
 
   return (
     <div className="space-y-8">
@@ -55,6 +64,19 @@ export default function ExamPage({ params }: { params: { exam: string } }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+
+      {/* Breadcrumb navigation */}
+      <nav className="text-xs text-neutral-500">
+        <a href="/" className="hover:text-neutral-300">Home</a>
+        <span className="mx-1">&gt;</span>
+        <a href={parentPath} className="hover:text-neutral-300">{parentName}</a>
+        <span className="mx-1">&gt;</span>
+        <span className="text-neutral-400">{preset.exam} {typeLabel} Resizer</span>
+      </nav>
 
       {/* SEO heading */}
       <div className="space-y-3">
