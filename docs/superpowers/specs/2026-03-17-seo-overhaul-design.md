@@ -204,6 +204,8 @@ For "thumb" type presets (e.g., `ibps-sbi-thumb`), the parent is Photo Resizer:
 
 > Home > Photo Resizer > IBPS/SBI Left Thumb Resizer
 
+**Note:** The existing `typeLabel` ternary in `[exam]/page.tsx` and `SEOHead.tsx` only handles "photo" and "signature", treating "thumb" as "Signature". Update to handle three types: `preset.type === "photo" ? "Photo" : preset.type === "thumb" ? "Thumb Impression" : "Signature"`.
+
 ### BreadcrumbList JSON-LD
 
 Add BreadcrumbList structured data to `[exam]` pages so Google displays breadcrumbs in search results:
