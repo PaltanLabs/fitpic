@@ -34,6 +34,20 @@ export default function ResultPreview({ result, preset, originalSize }: Props) {
         {validation.passed ? "Ready to upload!" : "Some checks need attention"}
       </div>
 
+      {/* Upscale warning */}
+      {result.upscaled && (
+        <div className="p-3 rounded-xl text-sm bg-amber-400/10 text-amber-400 border border-amber-400/30">
+          Source image was smaller than target — quality may be reduced.
+        </div>
+      )}
+
+      {/* Format changed notice */}
+      {result.formatChanged && (
+        <div className="p-3 rounded-xl text-sm bg-blue-400/10 text-blue-400 border border-blue-400/30">
+          PNG exceeded size limit — saved as JPEG instead.
+        </div>
+      )}
+
       {/* Preview */}
       <div className="flex gap-4 items-start">
         <div className="flex-1 text-center">
