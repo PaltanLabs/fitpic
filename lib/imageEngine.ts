@@ -164,20 +164,21 @@ function isDarkBackground(canvas: HTMLCanvasElement): boolean {
   const ctx = canvas.getContext("2d")!;
   const w = canvas.width;
   const h = canvas.height;
-  const sampleSize = Math.max(5, Math.min(20, Math.floor(w * 0.05)));
-
-  const regions: [number, number][] = [
-    [0, 0],
-    [w - sampleSize, 0],
-    [0, h - sampleSize],
-    [w - sampleSize, h - sampleSize],
-  ];
+  const edgeWidth = Math.max(3, Math.min(10, Math.floor(Math.min(w, h) * 0.03)));
 
   let darkPixels = 0;
   let totalPixels = 0;
 
-  for (const [x, y] of regions) {
-    const data = ctx.getImageData(x, y, sampleSize, sampleSize).data;
+  // Sample all 4 edges
+  const edges = [
+    ctx.getImageData(0, 0, w, edgeWidth),           // top
+    ctx.getImageData(0, h - edgeWidth, w, edgeWidth), // bottom
+    ctx.getImageData(0, 0, edgeWidth, h),             // left
+    ctx.getImageData(w - edgeWidth, 0, edgeWidth, h), // right
+  ];
+
+  for (const imageData of edges) {
+    const data = imageData.data;
     for (let i = 0; i < data.length; i += 4) {
       const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
       if (gray < DARK_BG_LUMINANCE_THRESHOLD) darkPixels++;
@@ -331,7 +332,11 @@ function drawDateStamp(
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, yOffset, width, stampHeight);
 
-  const label = `${name} | ${date}`;
+  // Truncate long names
+  const displayName = name.length > STAMP_NAME_MAX_LENGTH
+    ? name.substring(0, STAMP_NAME_MAX_LENGTH - 3) + "..."
+    : name;
+  const label = `${displayName} | ${date}`;
   const padding = 4;
   const maxTextWidth = width - padding * 2;
 
@@ -375,6 +380,7 @@ export async function processImage(
   const totalHeight = targetHeight + stampHeight;
 
   let destCanvas: HTMLCanvasElement;
+  let isUpscaled = false;
 
   if (signatureMode) {
     // === SIGNATURE PIPELINE ===
@@ -388,6 +394,7 @@ export async function processImage(
     const srcW = srcCanvas.width;
     const srcH = srcCanvas.height;
     const scale = Math.min(targetWidth / srcW, targetHeight / srcH);
+    isUpscaled = scale > 1;
     const fitW = Math.round(srcW * scale);
     const fitH = Math.round(srcH * scale);
 
@@ -424,6 +431,7 @@ export async function processImage(
     const srcW = srcCanvas.width;
     const srcH = srcCanvas.height;
     const downscaleRatio = Math.max(srcW / targetWidth, srcH / targetHeight);
+    isUpscaled = downscaleRatio < 1;
 
     // Heavier downscale = more aggressive sharpening.
     // Tuned for tiny exam targets (e.g. 100x120) to preserve edge clarity.
@@ -523,7 +531,7 @@ export async function processImage(
     quality: Math.round(bestQuality * 100),
     withinRange: bestSizeKB >= minKB && bestSizeKB <= maxKB,
     format: formatChanged ? "image/jpeg" : (format === "png" ? "image/png" : "image/jpeg"),
-    upscaled: false,
+    upscaled: isUpscaled,
     formatChanged,
   };
 }
