@@ -16,7 +16,7 @@ export default function ImageUploader({ onImageLoad, label = "Upload Photo" }: P
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(
-    (file: File) => {
+    async (file: File) => {
       setError(null);
 
       if (file.size > MAX_FILE_SIZE) {
@@ -24,23 +24,37 @@ export default function ImageUploader({ onImageLoad, label = "Upload Photo" }: P
         return;
       }
 
-      if (file.type === "image/heic") {
-        setError("HEIC format not yet supported. Please convert to JPEG first.");
-        return;
-      }
+      try {
+        // Use createImageBitmap for HEIC/WebP support + EXIF auto-rotation
+        const bitmap = await createImageBitmap(file, {
+          imageOrientation: "from-image",
+        });
 
-      const url = URL.createObjectURL(file);
-      const img = new Image();
-      img.onload = () => {
-        setPreview(url);
-        setFileName(file.name);
-        onImageLoad(img, file);
-      };
-      img.onerror = () => {
-        setError("Could not load image. Please try a different file.");
-        URL.revokeObjectURL(url);
-      };
-      img.src = url;
+        // Draw bitmap onto a canvas to get an HTMLImageElement
+        const canvas = document.createElement("canvas");
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(bitmap, 0, 0);
+        bitmap.close();
+
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+        const img = new Image();
+        img.onload = () => {
+          setPreview(dataUrl);
+          setFileName(file.name);
+          onImageLoad(img, file);
+        };
+        img.onerror = () => {
+          setError("Could not load image. Please try a different file.");
+        };
+        img.src = dataUrl;
+      } catch {
+        // createImageBitmap failed — browser can't decode this format
+        setError(
+          "Your browser can't open this file format. Please convert to JPEG or PNG first."
+        );
+      }
     },
     [onImageLoad]
   );
