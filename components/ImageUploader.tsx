@@ -24,36 +24,86 @@ export default function ImageUploader({ onImageLoad, label = "Upload Photo" }: P
         return;
       }
 
-      try {
-        // Use createImageBitmap for HEIC/WebP support + EXIF auto-rotation
-        const bitmap = await createImageBitmap(file, {
-          imageOrientation: "from-image",
-        });
+      const isStandardFormat =
+        file.type === "image/jpeg" ||
+        file.type === "image/png" ||
+        file.type === "image/webp";
 
-        // Draw bitmap onto a canvas to get an HTMLImageElement
-        const canvas = document.createElement("canvas");
-        canvas.width = bitmap.width;
-        canvas.height = bitmap.height;
-        const ctx = canvas.getContext("2d")!;
-        ctx.drawImage(bitmap, 0, 0);
-        bitmap.close();
+      if (isStandardFormat) {
+        // Standard formats: use object URL directly (preserves PNG transparency)
+        // Apply EXIF rotation via createImageBitmap, then draw to canvas
+        const url = URL.createObjectURL(file);
+        try {
+          const bitmap = await createImageBitmap(file, {
+            imageOrientation: "from-image",
+          });
+          // Draw to canvas to apply EXIF rotation
+          const canvas = document.createElement("canvas");
+          canvas.width = bitmap.width;
+          canvas.height = bitmap.height;
+          const ctx = canvas.getContext("2d")!;
+          ctx.drawImage(bitmap, 0, 0);
+          bitmap.close();
 
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
-        const img = new Image();
-        img.onload = () => {
-          setPreview(dataUrl);
-          setFileName(file.name);
-          onImageLoad(img, file);
-        };
-        img.onerror = () => {
-          setError("Could not load image. Please try a different file.");
-        };
-        img.src = dataUrl;
-      } catch {
-        // createImageBitmap failed — browser can't decode this format
-        setError(
-          "Your browser can't open this file format. Please convert to JPEG or PNG first."
-        );
+          // Use PNG for PNGs (preserves transparency), JPEG for others
+          const mimeType = file.type === "image/png" ? "image/png" : "image/jpeg";
+          const quality = file.type === "image/png" ? undefined : 0.95;
+          const dataUrl = canvas.toDataURL(mimeType, quality);
+
+          const img = new Image();
+          img.onload = () => {
+            setPreview(url);
+            setFileName(file.name);
+            onImageLoad(img, file);
+          };
+          img.onerror = () => {
+            setError("Could not load image. Please try a different file.");
+            URL.revokeObjectURL(url);
+          };
+          img.src = dataUrl;
+        } catch {
+          // createImageBitmap options not supported — fall back to direct load
+          const img = new Image();
+          img.onload = () => {
+            setPreview(url);
+            setFileName(file.name);
+            onImageLoad(img, file);
+          };
+          img.onerror = () => {
+            setError("Could not load image. Please try a different file.");
+            URL.revokeObjectURL(url);
+          };
+          img.src = url;
+        }
+      } else {
+        // Non-standard formats (HEIC, etc.): try createImageBitmap conversion
+        try {
+          const bitmap = await createImageBitmap(file, {
+            imageOrientation: "from-image",
+          });
+          const canvas = document.createElement("canvas");
+          canvas.width = bitmap.width;
+          canvas.height = bitmap.height;
+          const ctx = canvas.getContext("2d")!;
+          ctx.drawImage(bitmap, 0, 0);
+          bitmap.close();
+
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+          const img = new Image();
+          img.onload = () => {
+            setPreview(dataUrl);
+            setFileName(file.name);
+            onImageLoad(img, file);
+          };
+          img.onerror = () => {
+            setError("Could not load image. Please try a different file.");
+          };
+          img.src = dataUrl;
+        } catch {
+          setError(
+            "Your browser can't open this file format. Please convert to JPEG or PNG first."
+          );
+        }
       }
     },
     [onImageLoad]
