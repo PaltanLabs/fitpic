@@ -1,7 +1,35 @@
 import type { Metadata } from "next";
-import { SITE_NAME } from "@/lib/constants";
+import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import { PRESETS, getPresetSlug, CATEGORIES } from "@/lib/presets";
 import AdSlot from "@/components/AdSlot";
+
+const FAQ_ITEMS = [
+  {
+    question: "Is FitPic free?",
+    answer:
+      "Yes, FitPic is completely free to use. There are no hidden charges, no premium plans, and no limits on the number of photos or signatures you can resize.",
+  },
+  {
+    question: "Is my photo safe?",
+    answer:
+      "All processing happens entirely in your browser. Your photos and signatures are never uploaded to any server. We never see, store, or have access to your images.",
+  },
+  {
+    question: "Does it work on mobile?",
+    answer:
+      "Yes, FitPic works on all devices including smartphones, tablets, laptops, and desktops. You can even take a photo directly from your phone camera and resize it instantly.",
+  },
+  {
+    question: "Which exams are supported?",
+    answer:
+      "FitPic supports 150+ exam presets including SSC CGL, SSC CHSL, UPSC CSE, IBPS PO, IBPS Clerk, SBI PO, RRB NTPC, NEET UG, JEE Main, GATE, PAN Card, Aadhaar, Passport, and many more state-level exams.",
+  },
+  {
+    question: "Do I need to sign up?",
+    answer:
+      "No signup, no account, and no email required. Just open the website, pick your exam, upload your photo or signature, and download the resized file.",
+  },
+];
 
 export const metadata: Metadata = {
   title: `${SITE_NAME} — Free Photo & Signature Resizer for Govt Exams | SSC, UPSC, IBPS, NEET`,
@@ -174,7 +202,59 @@ export default function HomePage() {
         ))}
       </div>
 
+      {/* FAQ */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-bold text-neutral-300">
+          Frequently Asked Questions
+        </h2>
+        <div className="space-y-3">
+          {FAQ_ITEMS.map((item, i) => (
+            <details
+              key={i}
+              className="bg-neutral-900 rounded-xl border border-neutral-800 group"
+            >
+              <summary className="px-4 py-3 cursor-pointer text-sm font-medium text-neutral-200 hover:text-yellow-400 transition-colors">
+                {item.question}
+              </summary>
+              <p className="px-4 pb-3 text-neutral-400 text-sm leading-relaxed">
+                {item.answer}
+              </p>
+            </details>
+          ))}
+        </div>
+      </div>
+
       <AdSlot slot="bottom-rect" format="rectangle" />
+
+      {/* FAQPage + Organization JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: FAQ_ITEMS.map((item) => ({
+                "@type": "Question",
+                name: item.question,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: item.answer,
+                },
+              })),
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: SITE_NAME,
+              url: SITE_URL,
+              logo: `${SITE_URL}/icon.png`,
+              description:
+                "Free online photo and signature resizer for Indian government exams. 100% browser-based, private, no signup required.",
+            },
+          ]),
+        }}
+      />
     </div>
   );
 }

@@ -9,6 +9,7 @@ import {
 import type { Metadata } from "next";
 import ExamToolClient from "./ExamToolClient";
 import { EXAM_CONTENT } from "@/lib/exam-content";
+import { HINDI_EXAM_CONTENT } from "@/lib/hindi-content";
 
 export function generateStaticParams() {
   return PRESETS.filter((p) => p.id !== "custom").map((p) => ({
@@ -27,7 +28,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const preset = getPresetFromSlug(params.exam);
   if (!preset) return { title: "Not Found" };
-  return generatePresetMetadata(preset);
+  const base = generatePresetMetadata(preset);
+  const hasHindi = HINDI_EXAM_CONTENT.some((h) => h.examSlug === params.exam);
+  const metadata: Metadata = {
+    ...base,
+    alternates: {
+      canonical: base.alternates?.canonical,
+      languages: hasHindi ? { hi: `/hi/${params.exam}` } : undefined,
+    },
+  };
+  return metadata;
 }
 
 export default function ExamPage({ params }: { params: { exam: string } }) {
