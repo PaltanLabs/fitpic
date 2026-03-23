@@ -41,7 +41,7 @@ async function compressPdf(
 
   const pdfBytes = await newDoc.save();
   return {
-    blob: new Blob([pdfBytes.buffer as ArrayBuffer], { type: "application/pdf" }),
+    blob: new Blob([pdfBytes as BlobPart], { type: "application/pdf" }),
     pages: pdfDoc.getPageCount(),
   };
 }
