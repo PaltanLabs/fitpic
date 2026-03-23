@@ -3,6 +3,7 @@ import { PRESETS, getPresetSlug } from "@/lib/presets";
 import { SITE_URL } from "@/lib/constants";
 import { CATEGORY_SLUGS } from "@/lib/category-slugs";
 import { BLOG_POSTS } from "@/lib/blog-posts";
+import { HINDI_EXAM_CONTENT } from "@/lib/hindi-content";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = [
@@ -40,5 +41,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   ];
 
-  return [...staticRoutes, ...categoryRoutes, ...examRoutes, ...blogRoutes];
+  const hindiRoutes = HINDI_EXAM_CONTENT.map((h) => ({
+    url: `${SITE_URL}/hi/${h.examSlug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.65,
+  }));
+
+  return [...staticRoutes, ...categoryRoutes, ...blogRoutes, ...hindiRoutes, ...examRoutes];
 }
