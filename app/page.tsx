@@ -100,7 +100,7 @@ export default function HomePage() {
             <div className="text-yellow-400 font-bold text-lg mb-1">1</div>
             <h3 className="text-neutral-200 font-medium text-sm">Choose Your Exam</h3>
             <p className="text-neutral-500 text-xs mt-1">
-              Select from 22+ exam presets (SSC, UPSC, IBPS, Railway, NEET, PAN,
+              Select from 150+ exam presets (SSC, UPSC, IBPS, Railway, NEET, PAN,
               Aadhaar, Passport) or enter custom dimensions.
             </p>
           </div>

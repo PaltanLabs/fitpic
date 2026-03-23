@@ -5,7 +5,7 @@ import Script from "next/script";
 import { PostHogProvider } from "@/components/PostHogProvider";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://fitpic.in"),
+  metadataBase: new URL("https://www.fitpic.in"),
   title: {
     template: `%s | ${SITE_NAME}`,
     default: `${SITE_NAME} - Free Govt Exam Photo & Signature Resizer`,
@@ -52,12 +52,11 @@ export default function RootLayout({
                 {SITE_NAME}
               </a>
               <nav className="flex gap-4 text-sm text-neutral-400">
-                <a href="/photo-resizer" className="hover:text-neutral-200">
-                  Photo
-                </a>
-                <a href="/signature-resizer" className="hover:text-neutral-200">
-                  Signature
-                </a>
+                <a href="/photo-resizer" className="hover:text-neutral-200">Photo</a>
+                <a href="/signature-resizer" className="hover:text-neutral-200">Signature</a>
+                <a href="/category/ssc" className="hover:text-neutral-200 hidden sm:inline">SSC</a>
+                <a href="/category/banking" className="hover:text-neutral-200 hidden sm:inline">Banking</a>
+                <a href="/category/state-psc" className="hover:text-neutral-200 hidden sm:inline">State PSC</a>
               </nav>
             </div>
           </header>
