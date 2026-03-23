@@ -9,6 +9,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/photo-resizer`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.9 },
     { url: `${SITE_URL}/signature-resizer`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.9 },
     { url: `${SITE_URL}/photo-signature-joiner`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
+    { url: `${SITE_URL}/name-date-stamp`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.9 },
+    { url: `${SITE_URL}/photo-validator`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.9 },
+    { url: `${SITE_URL}/privacy-policy`, lastModified: new Date(), changeFrequency: "yearly" as const, priority: 0.3 },
+    { url: `${SITE_URL}/about`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.4 },
   ];
 
   const categoryRoutes = Object.keys(CATEGORY_SLUGS).map((slug) => ({
