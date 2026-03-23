@@ -314,7 +314,7 @@ export const EXAM_CONTENT: Record<string, ExamContent> = {
     uploadSteps: [
       "Register on the BPSC online portal at onlinebpsc.bihar.gov.in by creating a new user account.",
       "Fill in the application form with personal, educational, and domicile details.",
-      "Upload a recent passport-size photograph in JPEG format (50-100KB) with a white or light background.",
+      "Upload a recent passport-size photograph in JPEG format (20-50KB) with a white or light background.",
       "Upload your scanned signature in JPEG format (20-50KB) signed with black ink on white paper.",
       "Verify all details, pay the application fee through the integrated payment gateway, and print the confirmation.",
     ],
