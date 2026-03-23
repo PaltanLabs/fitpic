@@ -7,8 +7,16 @@ import ResultPreview from "@/components/ResultPreview";
 import DateStamper from "@/components/DateStamper";
 import AdSlot from "@/components/AdSlot";
 import Tips from "@/components/Tips";
+import PhotoFramingControls from "@/components/PhotoFramingControls";
 import { type ExamPreset } from "@/lib/presets";
 import { processImage, type ProcessResult } from "@/lib/imageEngine";
+import { makeWhiteBackground } from "@/lib/whiteBackground";
+import { preparePhotoSourceImage } from "@/lib/photoSource";
+import {
+  DEFAULT_CROP_BIAS_Y,
+  getPhotoToolCategoryResetState,
+  getPhotoToolPresetState,
+} from "@/lib/photoToolState";
 
 export default function PhotoResizerClient() {
   const [preset, setPreset] = useState<ExamPreset | null>(null);
@@ -20,6 +28,10 @@ export default function PhotoResizerClient() {
   const [dateStamp, setDateStamp] = useState<
     { name: string; date: string } | undefined
   >();
+  const [cropBiasY, setCropBiasY] = useState(DEFAULT_CROP_BIAS_Y);
+  const [whiteBackgroundMode, setWhiteBackgroundMode] = useState(false);
+  const [whiteBgError, setWhiteBgError] = useState<string | null>(null);
+  const [whiteBgDurationMs, setWhiteBgDurationMs] = useState<number | null>(null);
   const [result, setResult] = useState<ProcessResult | null>(null);
   const [processing, setProcessing] = useState(false);
 
@@ -28,6 +40,8 @@ export default function PhotoResizerClient() {
       setImage(img);
       setFile(f);
       setResult(null);
+      setWhiteBgError(null);
+      setWhiteBgDurationMs(null);
     },
     []
   );
@@ -35,8 +49,21 @@ export default function PhotoResizerClient() {
   const handleResize = async () => {
     if (!preset || !image) return;
     setProcessing(true);
+    setWhiteBgError(null);
+    setWhiteBgDurationMs(null);
     try {
-      const res = await processImage(image, {
+      const prepared = await preparePhotoSourceImage({
+        image,
+        whiteBackgroundMode,
+        makeWhiteBackgroundFn: makeWhiteBackground,
+      });
+      if (prepared.whiteBgError) {
+        setWhiteBgError(prepared.whiteBgError);
+        return;
+      }
+      setWhiteBgDurationMs(prepared.whiteBgDurationMs);
+
+      const res = await processImage(prepared.sourceImage, {
         targetWidth: preset.width,
         targetHeight: preset.height,
         minKB: preset.minKB,
@@ -45,6 +72,7 @@ export default function PhotoResizerClient() {
         format: preset.format,
         dateStamp: dateStampEnabled ? dateStamp : undefined,
         signatureMode: false,
+        cropBiasY,
       });
       setResult(res);
     } finally {
@@ -74,16 +102,26 @@ export default function PhotoResizerClient() {
         onCategoryChange={() => {
           clearUploadState();
           setPreset(null);
-          setDateStampEnabled(false);
-          setDateStamp(undefined);
+          const reset = getPhotoToolCategoryResetState();
+          setDateStampEnabled(reset.dateStampEnabled);
+          setDateStamp(reset.dateStamp);
+          setCropBiasY(reset.cropBiasY);
+          setWhiteBackgroundMode(reset.whiteBackgroundMode);
+          setWhiteBgError(reset.whiteBgError);
+          setWhiteBgDurationMs(reset.whiteBgDurationMs);
           setUploaderKey((k) => k + 1);
           setDateStamperKey((k) => k + 1);
         }}
         onSelect={(p) => {
           clearUploadState();
           setPreset(p);
-          setDateStampEnabled(p.requiresDateStamp);
-          setDateStamp(undefined);
+          const next = getPhotoToolPresetState(p.requiresDateStamp);
+          setDateStampEnabled(next.dateStampEnabled);
+          setDateStamp(next.dateStamp);
+          setCropBiasY(next.cropBiasY);
+          setWhiteBackgroundMode(next.whiteBackgroundMode);
+          setWhiteBgError(next.whiteBgError);
+          setWhiteBgDurationMs(next.whiteBgDurationMs);
           setUploaderKey((k) => k + 1);
           setDateStamperKey((k) => k + 1);
         }}
@@ -115,6 +153,22 @@ export default function PhotoResizerClient() {
       {/* Step 3: Resize */}
       {preset && image && !result && (
         <div className="space-y-3">
+          <PhotoFramingControls
+            cropBiasY={cropBiasY}
+            onCropBiasYChange={setCropBiasY}
+            whiteBackgroundMode={whiteBackgroundMode}
+            onWhiteBackgroundModeChange={setWhiteBackgroundMode}
+          />
+          {whiteBgError && (
+            <div className="bg-rose-400/10 border border-rose-400/30 text-rose-300 text-xs rounded-xl p-3">
+              {whiteBgError}
+            </div>
+          )}
+          {!whiteBgError && whiteBackgroundMode && whiteBgDurationMs !== null && (
+            <div className="bg-emerald-400/10 border border-emerald-400/30 text-emerald-300 text-xs rounded-xl p-3">
+              White background applied in {(whiteBgDurationMs / 1000).toFixed(2)}s.
+            </div>
+          )}
           <div className="bg-neutral-900 rounded-xl p-4 text-sm text-neutral-400">
             <p>
               Target: <span className="text-neutral-200">{preset.width}x{preset.height}px</span> |{" "}
