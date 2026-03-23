@@ -57,6 +57,7 @@ export default function RootLayout({
                 <a href="/category/ssc" className="hover:text-neutral-200 hidden sm:inline">SSC</a>
                 <a href="/category/banking" className="hover:text-neutral-200 hidden sm:inline">Banking</a>
                 <a href="/category/state-psc" className="hover:text-neutral-200 hidden sm:inline">State PSC</a>
+                <a href="/blog" className="hover:text-neutral-200">Blog</a>
               </nav>
             </div>
           </header>

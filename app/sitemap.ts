@@ -2,6 +2,7 @@ import { MetadataRoute } from "next";
 import { PRESETS, getPresetSlug } from "@/lib/presets";
 import { SITE_URL } from "@/lib/constants";
 import { CATEGORY_SLUGS } from "@/lib/category-slugs";
+import { BLOG_POSTS } from "@/lib/blog-posts";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = [
@@ -29,5 +30,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...categoryRoutes, ...examRoutes];
+  const blogRoutes = [
+    { url: `${SITE_URL}/blog`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
+    ...BLOG_POSTS.map((post) => ({
+      url: `${SITE_URL}/blog/${post.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.75,
+    })),
+  ];
+
+  return [...staticRoutes, ...categoryRoutes, ...examRoutes, ...blogRoutes];
 }
