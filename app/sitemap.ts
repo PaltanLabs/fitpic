@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { PRESETS, getPresetSlug } from "@/lib/presets";
 import { SITE_URL } from "@/lib/constants";
+import { CATEGORY_SLUGS } from "@/lib/category-slugs";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = [
@@ -10,6 +11,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/photo-signature-joiner`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
   ];
 
+  const categoryRoutes = Object.keys(CATEGORY_SLUGS).map((slug) => ({
+    url: `${SITE_URL}/category/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.85,
+  }));
+
   const examRoutes = PRESETS.filter((p) => p.id !== "custom").map((p) => ({
     url: `${SITE_URL}/${getPresetSlug(p)}`,
     lastModified: new Date(),
@@ -17,5 +25,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...examRoutes];
+  return [...staticRoutes, ...categoryRoutes, ...examRoutes];
 }

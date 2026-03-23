@@ -8,6 +8,7 @@ import {
 } from "@/components/SEOHead";
 import type { Metadata } from "next";
 import ExamToolClient from "./ExamToolClient";
+import { EXAM_CONTENT } from "@/lib/exam-content";
 
 export function generateStaticParams() {
   return PRESETS.filter((p) => p.id !== "custom").map((p) => ({
@@ -96,6 +97,55 @@ export default function ExamPage({ params }: { params: { exam: string } }) {
       {/* The actual tool */}
       <ExamToolClient presetId={preset.id} />
 
+      {/* Exam-specific content */}
+      {EXAM_CONTENT[preset.exam] && (
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <h2 className="text-lg font-bold text-neutral-200">
+              About {preset.exam}
+            </h2>
+            <p className="text-neutral-400 text-sm leading-relaxed">
+              {EXAM_CONTENT[preset.exam].about}
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-lg font-bold text-neutral-200">
+              How to Upload Your {typeLabel} for {preset.exam}
+            </h2>
+            <ol className="list-decimal list-inside space-y-1 text-neutral-400 text-sm">
+              {EXAM_CONTENT[preset.exam].uploadSteps.map((step, i) => (
+                <li key={i}>{step}</li>
+              ))}
+            </ol>
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-lg font-bold text-neutral-200">
+              Common {typeLabel} Mistakes to Avoid
+            </h2>
+            <ul className="list-disc list-inside space-y-1 text-neutral-400 text-sm">
+              {EXAM_CONTENT[preset.exam].commonMistakes.map((m, i) => (
+                <li key={i}>{m}</li>
+              ))}
+            </ul>
+          </div>
+
+          {preset.type === "photo" && (
+            <div className="space-y-2">
+              <h2 className="text-lg font-bold text-neutral-200">
+                Tips for {preset.exam} {typeLabel}
+              </h2>
+              <ul className="list-disc list-inside space-y-1 text-neutral-400 text-sm">
+                {EXAM_CONTENT[preset.exam].photoTips.map((t, i) => (
+                  <li key={i}>{t}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* FAQ section */}
       <div className="space-y-4">
         <h2 className="text-xl font-bold text-neutral-200">
@@ -113,12 +163,18 @@ export default function ExamPage({ params }: { params: { exam: string } }) {
         ))}
       </div>
 
-      {/* Related links */}
+      {/* Related links — same category first */}
       <div className="space-y-2">
         <h2 className="text-lg font-bold text-neutral-300">Related Tools</h2>
         <div className="flex flex-wrap gap-2">
-          {PRESETS.filter((p) => p.id !== preset.id && p.id !== "custom")
-            .slice(0, 6)
+          {PRESETS
+            .filter((p) => p.id !== preset.id && p.id !== "custom")
+            .sort((a, b) => {
+              if (a.category === preset.category && b.category !== preset.category) return -1;
+              if (b.category === preset.category && a.category !== preset.category) return 1;
+              return 0;
+            })
+            .slice(0, 10)
             .map((p) => (
               <a
                 key={p.id}
