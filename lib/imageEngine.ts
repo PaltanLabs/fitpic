@@ -13,6 +13,37 @@ import Pica from "pica";
 
 const pica = new Pica();
 
+// ===== Engine constants =====
+const SIGNATURE_INK_THRESHOLD = 115;
+const MULTI_PASS_RATIO = 3;
+const THREE_PASS_RATIO = 8;
+const DARK_BG_LUMINANCE_THRESHOLD = 128;
+const DARK_BG_PIXEL_RATIO = 0.5;
+const MIN_STAMP_FONT_SIZE = 7;
+const STAMP_FONT_FAMILY = "system-ui, -apple-system, sans-serif";
+const STAMP_HEIGHT_RATIO = 0.12;
+const MIN_STAMP_HEIGHT = 16;
+const TOP_CROP_BIAS = 0.20;
+const STAMP_NAME_MAX_LENGTH = 25;
+const JPEG_SEARCH_ITERATIONS = 25;
+const JPEG_MIN_QUALITY = 0.05;
+const JPEG_MAX_QUALITY = 0.99;
+const JPEG_CONVERGENCE_DELTA = 0.005;
+const SIGNATURE_UNSHARP = { amount: 200, radius: 0.8, threshold: 1 };
+const UNSHARP_CONFIGS = [
+  { maxRatio: 1.5, amount: 80, radius: 0.4 },
+  { maxRatio: 3, amount: 160, radius: 0.8 },
+  { maxRatio: 6, amount: 260, radius: 0.9 },
+  { maxRatio: Infinity, amount: 320, radius: 1.0 },
+] as const;
+
+export class ProcessingError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ProcessingError";
+  }
+}
+
 export interface ProcessOptions {
   targetWidth: number;
   targetHeight: number;
@@ -36,6 +67,8 @@ export interface ProcessResult {
   quality: number;
   withinRange: boolean;
   format: string;
+  upscaled: boolean;
+  formatChanged: boolean;
 }
 
 function makeCanvas(w: number, h: number): HTMLCanvasElement {
@@ -67,7 +100,7 @@ function drawPhotoCropped(
     // Source taller — crop bottom (keep head at top)
     cropH = Math.round(srcW / targetAspect);
     // Top-biased: only crop 20% from top, rest from bottom
-    cropY = Math.round((srcH - cropH) * 0.20);
+    cropY = Math.round((srcH - cropH) * TOP_CROP_BIAS);
   }
 
   const c = makeCanvas(cropW, cropH);
@@ -131,28 +164,29 @@ function isDarkBackground(canvas: HTMLCanvasElement): boolean {
   const ctx = canvas.getContext("2d")!;
   const w = canvas.width;
   const h = canvas.height;
-  const sampleSize = Math.max(5, Math.min(20, Math.floor(w * 0.05)));
-
-  const regions: [number, number][] = [
-    [0, 0],
-    [w - sampleSize, 0],
-    [0, h - sampleSize],
-    [w - sampleSize, h - sampleSize],
-  ];
+  const edgeWidth = Math.max(3, Math.min(10, Math.floor(Math.min(w, h) * 0.03)));
 
   let darkPixels = 0;
   let totalPixels = 0;
 
-  for (const [x, y] of regions) {
-    const data = ctx.getImageData(x, y, sampleSize, sampleSize).data;
+  // Sample all 4 edges
+  const edges = [
+    ctx.getImageData(0, 0, w, edgeWidth),           // top
+    ctx.getImageData(0, h - edgeWidth, w, edgeWidth), // bottom
+    ctx.getImageData(0, 0, edgeWidth, h),             // left
+    ctx.getImageData(w - edgeWidth, 0, edgeWidth, h), // right
+  ];
+
+  for (const imageData of edges) {
+    const data = imageData.data;
     for (let i = 0; i < data.length; i += 4) {
       const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-      if (gray < 128) darkPixels++;
+      if (gray < DARK_BG_LUMINANCE_THRESHOLD) darkPixels++;
       totalPixels++;
     }
   }
 
-  return darkPixels / totalPixels > 0.5;
+  return darkPixels / totalPixels > DARK_BG_PIXEL_RATIO;
 }
 
 /**
@@ -172,7 +206,7 @@ function processSignatureOnSource(canvas: HTMLCanvasElement): void {
   for (let i = 0; i < data.length; i += 4) {
     let gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
     if (needsInvert) gray = 255 - gray;
-    const val = gray < 140 ? 0 : 255;
+    const val = gray < SIGNATURE_INK_THRESHOLD ? 0 : 255;
     data[i] = val;
     data[i + 1] = val;
     data[i + 2] = val;
@@ -182,11 +216,6 @@ function processSignatureOnSource(canvas: HTMLCanvasElement): void {
   ctx.putImageData(imageData, 0, 0);
 }
 
-/**
- * Multi-pass Pica resize for extreme downscales.
- * If ratio > 4x, first resize to 2x target, then to target.
- * Produces sharper results than a single huge downscale.
- */
 async function picaResizeMultiPass(
   src: HTMLCanvasElement,
   targetW: number,
@@ -199,37 +228,92 @@ async function picaResizeMultiPass(
   const srcH = src.height;
   const ratio = Math.max(srcW / targetW, srcH / targetH);
 
-  if (ratio > 4) {
-    // First pass: resize to 2x target
+  if (ratio > THREE_PASS_RATIO) {
+    // Three-pass: source → 4x target → 2x target → target
+    const mid1W = targetW * 4;
+    const mid1H = targetH * 4;
+    const mid1Canvas = makeCanvas(mid1W, mid1H);
+    try {
+      await pica.resize(src, mid1Canvas, {
+        unsharpAmount: Math.round(unsharpAmount * 0.5),
+        unsharpRadius: unsharpRadius * 0.5,
+        unsharpThreshold,
+        alpha: false,
+      });
+    } catch {
+      throw new ProcessingError("Failed to resize image. The file may be corrupted.");
+    }
+
+    const mid2W = targetW * 2;
+    const mid2H = targetH * 2;
+    const mid2Canvas = makeCanvas(mid2W, mid2H);
+    try {
+      await pica.resize(mid1Canvas, mid2Canvas, {
+        unsharpAmount: Math.round(unsharpAmount * 0.75),
+        unsharpRadius,
+        unsharpThreshold,
+        alpha: false,
+      });
+    } catch {
+      throw new ProcessingError("Failed to resize image. The file may be corrupted.");
+    }
+
+    const destCanvas = makeCanvas(targetW, targetH);
+    try {
+      await pica.resize(mid2Canvas, destCanvas, {
+        unsharpAmount,
+        unsharpRadius,
+        unsharpThreshold,
+        alpha: false,
+      });
+    } catch {
+      throw new ProcessingError("Failed to resize image. The file may be corrupted.");
+    }
+    return destCanvas;
+  }
+
+  if (ratio > MULTI_PASS_RATIO) {
+    // Two-pass: source → 2x target → target
     const midW = targetW * 2;
     const midH = targetH * 2;
     const midCanvas = makeCanvas(midW, midH);
-    await pica.resize(src, midCanvas, {
-      unsharpAmount: Math.round(unsharpAmount * 0.5),
-      unsharpRadius: unsharpRadius * 0.5,
-      unsharpThreshold,
-      alpha: false,
-    });
+    try {
+      await pica.resize(src, midCanvas, {
+        unsharpAmount: Math.round(unsharpAmount * 0.75),
+        unsharpRadius,
+        unsharpThreshold,
+        alpha: false,
+      });
+    } catch {
+      throw new ProcessingError("Failed to resize image. The file may be corrupted.");
+    }
 
-    // Second pass: resize to target with full unsharp
     const destCanvas = makeCanvas(targetW, targetH);
-    await pica.resize(midCanvas, destCanvas, {
-      unsharpAmount,
-      unsharpRadius,
-      unsharpThreshold,
-      alpha: false,
-    });
+    try {
+      await pica.resize(midCanvas, destCanvas, {
+        unsharpAmount,
+        unsharpRadius,
+        unsharpThreshold,
+        alpha: false,
+      });
+    } catch {
+      throw new ProcessingError("Failed to resize image. The file may be corrupted.");
+    }
     return destCanvas;
   }
 
   // Single pass
   const destCanvas = makeCanvas(targetW, targetH);
-  await pica.resize(src, destCanvas, {
-    unsharpAmount,
-    unsharpRadius,
-    unsharpThreshold,
-    alpha: false,
-  });
+  try {
+    await pica.resize(src, destCanvas, {
+      unsharpAmount,
+      unsharpRadius,
+      unsharpThreshold,
+      alpha: false,
+    });
+  } catch {
+    throw new ProcessingError("Failed to resize image. The file may be corrupted.");
+  }
   return destCanvas;
 }
 
@@ -248,17 +332,21 @@ function drawDateStamp(
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, yOffset, width, stampHeight);
 
-  const label = `${name} | ${date}`;
+  // Truncate long names
+  const displayName = name.length > STAMP_NAME_MAX_LENGTH
+    ? name.substring(0, STAMP_NAME_MAX_LENGTH - 3) + "..."
+    : name;
+  const label = `${displayName} | ${date}`;
   const padding = 4;
   const maxTextWidth = width - padding * 2;
 
-  let fontSize = Math.max(6, Math.round(stampHeight * 0.45));
-  ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+  let fontSize = Math.max(MIN_STAMP_FONT_SIZE, Math.round(stampHeight * 0.45));
+  ctx.font = `bold ${fontSize}px ${STAMP_FONT_FAMILY}`;
   let textWidth = ctx.measureText(label).width;
 
-  while (textWidth > maxTextWidth && fontSize > 5) {
+  while (textWidth > maxTextWidth && fontSize > MIN_STAMP_FONT_SIZE) {
     fontSize--;
-    ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+    ctx.font = `bold ${fontSize}px ${STAMP_FONT_FAMILY}`;
     textWidth = ctx.measureText(label).width;
   }
 
@@ -287,11 +375,12 @@ export async function processImage(
   const { targetWidth, targetHeight, minKB, maxKB, format, dateStamp, signatureMode } = options;
 
   const stampHeight = dateStamp
-    ? Math.max(16, Math.round(targetHeight * 0.12))
+    ? Math.max(MIN_STAMP_HEIGHT, Math.round(targetHeight * STAMP_HEIGHT_RATIO))
     : 0;
   const totalHeight = targetHeight + stampHeight;
 
   let destCanvas: HTMLCanvasElement;
+  let isUpscaled = false;
 
   if (signatureMode) {
     // === SIGNATURE PIPELINE ===
@@ -305,17 +394,22 @@ export async function processImage(
     const srcW = srcCanvas.width;
     const srcH = srcCanvas.height;
     const scale = Math.min(targetWidth / srcW, targetHeight / srcH);
+    isUpscaled = scale > 1;
     const fitW = Math.round(srcW * scale);
     const fitH = Math.round(srcH * scale);
 
     // Resize to fitted dimensions
     const fitCanvas = makeCanvas(fitW, fitH);
-    await pica.resize(srcCanvas, fitCanvas, {
-      unsharpAmount: 200,
-      unsharpRadius: 0.8,
-      unsharpThreshold: 1,
-      alpha: false,
-    });
+    try {
+      await pica.resize(srcCanvas, fitCanvas, {
+        unsharpAmount: SIGNATURE_UNSHARP.amount,
+        unsharpRadius: SIGNATURE_UNSHARP.radius,
+        unsharpThreshold: SIGNATURE_UNSHARP.threshold,
+        alpha: false,
+      });
+    } catch {
+      throw new ProcessingError("Failed to resize image. The file may be corrupted.");
+    }
 
     // 4. Center on white target canvas (pad)
     destCanvas = makeCanvas(targetWidth, targetHeight);
@@ -337,29 +431,18 @@ export async function processImage(
     const srcW = srcCanvas.width;
     const srcH = srcCanvas.height;
     const downscaleRatio = Math.max(srcW / targetWidth, srcH / targetHeight);
+    isUpscaled = downscaleRatio < 1;
 
     // Heavier downscale = more aggressive sharpening.
     // Tuned for tiny exam targets (e.g. 100x120) to preserve edge clarity.
-    let unsharpAmount: number, unsharpRadius: number;
-    if (downscaleRatio <= 1.5) {
-      // Minimal resize — light sharpen to preserve original detail
-      unsharpAmount = 80;
-      unsharpRadius = 0.4;
-    } else if (downscaleRatio <= 3) {
-      unsharpAmount = 160;
-      unsharpRadius = 0.8;
-    } else if (downscaleRatio <= 6) {
-      unsharpAmount = 260;
-      unsharpRadius = 0.9;
-    } else {
-      // Extreme downscale (>6x) — stronger, slightly tighter radius
-      unsharpAmount = 320;
-      unsharpRadius = 0.8;
-    }
+    const config = UNSHARP_CONFIGS.find((c) => downscaleRatio <= c.maxRatio)!;
+    let unsharpAmount = config.amount;
+    let unsharpRadius = config.radius;
+    const unsharpThreshold = Math.max(1, Math.min(3, Math.round(downscaleRatio / 3)));
 
     destCanvas = await picaResizeMultiPass(
       srcCanvas, targetWidth, targetHeight,
-      unsharpAmount, unsharpRadius, 2
+      unsharpAmount, unsharpRadius, unsharpThreshold
     );
   }
 
@@ -382,18 +465,36 @@ export async function processImage(
   let bestSizeKB = 0;
   let bestQuality = 0.95;
 
+  let formatChanged = false;
+
   if (format === "png") {
-    bestBlob = await pica.toBlob(finalCanvas, "image/png", 0);
-    bestDataUrl = await blobToDataUrl(bestBlob);
+    try {
+      bestBlob = await pica.toBlob(finalCanvas, "image/png", 0);
+    } catch {
+      throw new ProcessingError("Failed to compress image. Try a smaller source file.");
+    }
     bestSizeKB = Math.round(bestBlob.size / 1024);
     bestQuality = 1.0;
-  } else {
-    let lo = 0.05;
-    let hi = 0.99;
+    bestDataUrl = await blobToDataUrl(bestBlob);
 
-    for (let i = 0; i < 25; i++) {
+    // If PNG exceeds maxKB, fall back to JPEG
+    if (bestSizeKB > maxKB) {
+      formatChanged = true;
+    }
+  }
+
+  if (format === "jpeg" || formatChanged) {
+    let lo = JPEG_MIN_QUALITY;
+    let hi = JPEG_MAX_QUALITY;
+
+    for (let i = 0; i < JPEG_SEARCH_ITERATIONS; i++) {
       const mid = (lo + hi) / 2;
-      const blob = await pica.toBlob(finalCanvas, "image/jpeg", mid);
+      let blob: Blob;
+      try {
+        blob = await pica.toBlob(finalCanvas, "image/jpeg", mid);
+      } catch {
+        throw new ProcessingError("Failed to compress image. Try a smaller source file.");
+      }
       const sizeKB = Math.round(blob.size / 1024);
 
       if (sizeKB <= maxKB) {
@@ -405,13 +506,17 @@ export async function processImage(
         hi = mid;
       }
 
-      if (hi - lo < 0.005) break;
+      if (hi - lo < JPEG_CONVERGENCE_DELTA) break;
     }
 
-    if (!bestBlob) {
-      bestBlob = await pica.toBlob(finalCanvas, "image/jpeg", 0.05);
+    if (!bestBlob || formatChanged) {
+      try {
+        bestBlob = await pica.toBlob(finalCanvas, "image/jpeg", JPEG_MIN_QUALITY);
+      } catch {
+        throw new ProcessingError("Failed to compress image. Try a smaller source file.");
+      }
       bestSizeKB = Math.round(bestBlob.size / 1024);
-      bestQuality = 0.05;
+      bestQuality = JPEG_MIN_QUALITY;
     }
 
     bestDataUrl = await blobToDataUrl(bestBlob);
@@ -425,6 +530,8 @@ export async function processImage(
     height: totalHeight,
     quality: Math.round(bestQuality * 100),
     withinRange: bestSizeKB >= minKB && bestSizeKB <= maxKB,
-    format: format === "png" ? "image/png" : "image/jpeg",
+    format: formatChanged ? "image/jpeg" : (format === "png" ? "image/png" : "image/jpeg"),
+    upscaled: isUpscaled,
+    formatChanged,
   };
 }

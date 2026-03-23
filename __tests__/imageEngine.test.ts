@@ -2,7 +2,7 @@
  * Image engine tests using sharp (Node.js compatible).
  * Tests the core binary search compression algorithm.
  * Matches the Pica browser engine behavior:
- * - Signature: process at source res, threshold at 140
+ * - Signature: process at source res, threshold at 115
  * - Date stamp: single line "Name | Date", 12% height
  * - Binary search: maximize quality under maxKB
  */
@@ -43,11 +43,11 @@ async function processSignature(inputBuf: Buffer, width: number, height: number)
   }
   const needsInvert = darkPixels / totalPixels > 0.5;
 
-  // Step 3: Process at source resolution — grayscale → invert → threshold at 140
+  // Step 3: Process at source resolution — grayscale → invert → threshold at 115
   let pipeline = sharp(flatBuf).grayscale();
   if (needsInvert) pipeline = pipeline.negate({ alpha: false });
   const processedBuf = await pipeline
-    .threshold(140)
+    .threshold(115)
     .flatten({ background: { r: 255, g: 255, b: 255 } })
     .toBuffer();
 
@@ -248,5 +248,62 @@ describe("imageEngine", () => {
     expect(r.height).toBe(230);
 
     fs.unlinkSync(tmpPath);
+  });
+
+  test("Upscale detection: source smaller than target", async () => {
+    const buf = await sharp({
+      create: { width: 50, height: 50, channels: 3, background: { r: 200, g: 200, b: 200 } },
+    }).jpeg().toBuffer();
+
+    const tmpPath = path.join(__dirname, "../test-output/small_test.jpg");
+    if (!fs.existsSync(path.dirname(tmpPath))) fs.mkdirSync(path.dirname(tmpPath), { recursive: true });
+    fs.writeFileSync(tmpPath, buf);
+
+    const r = await processImage(tmpPath, { targetWidth: 200, targetHeight: 230, minKB: 1, maxKB: 50, bgColor: "#FFFFFF" });
+    expect(r.width).toBe(200);
+    expect(r.height).toBe(230);
+
+    fs.unlinkSync(tmpPath);
+  });
+
+  test("Date stamp with very long name truncates", async () => {
+    const r = await processImage(PHOTO, {
+      targetWidth: 100, targetHeight: 120, minKB: 1, maxKB: 50,
+      bgColor: "#FFFFFF",
+      dateStamp: { name: "Anitha Venkatakrishnan Subramaniam", date: "17/03/2026" },
+    });
+    expect(r.height).toBe(136);
+    expect(r.sizeKB).toBeLessThanOrEqual(50);
+  });
+
+  test("User photo SiddharthaBose.JPG processes for all major presets", async () => {
+    const userPhoto = "/Users/siddharthabose/Downloads/adgen/SiddharthaBose.JPG";
+    if (!fs.existsSync(userPhoto)) return;
+
+    // SSC
+    const ssc = await processImage(userPhoto, { targetWidth: 100, targetHeight: 120, minKB: 20, maxKB: 50, bgColor: "#FFFFFF" });
+    expect(ssc.width).toBe(100);
+    expect(ssc.height).toBe(120);
+    expect(ssc.sizeKB).toBeLessThanOrEqual(50);
+
+    // UPSC
+    const upsc = await processImage(userPhoto, { targetWidth: 350, targetHeight: 350, minKB: 30, maxKB: 100, bgColor: "#FFFFFF" });
+    expect(upsc.width).toBe(350);
+    expect(upsc.sizeKB).toBeLessThanOrEqual(100);
+
+    // Passport
+    const passport = await processImage(userPhoto, { targetWidth: 413, targetHeight: 531, minKB: 20, maxKB: 300, bgColor: "#FFFFFF" });
+    expect(passport.width).toBe(413);
+    expect(passport.sizeKB).toBeLessThanOrEqual(300);
+  });
+
+  test("User signature bose-sign.png processes for SSC preset", async () => {
+    const userSig = "/Users/siddharthabose/Downloads/adgen/bose sign.png";
+    if (!fs.existsSync(userSig)) return;
+
+    const r = await processImage(userSig, { targetWidth: 140, targetHeight: 60, minKB: 10, maxKB: 20, bgColor: null, signatureMode: true });
+    expect(r.width).toBe(140);
+    expect(r.height).toBe(60);
+    expect(r.sizeKB).toBeLessThanOrEqual(20);
   });
 });
