@@ -33,7 +33,7 @@ export default function AboutPage() {
 
         <h2 className="text-lg font-bold text-neutral-200 pt-2">Built by PaltanLabs</h2>
         <p>
-          FitPic is built and maintained by <a href="https://github.com/PaltanLabs" className="text-yellow-400 hover:underline" target="_blank" rel="noopener noreferrer">PaltanLabs</a>. The source code is available on <a href="https://github.com/PaltanLabs/fitpic" className="text-yellow-400 hover:underline" target="_blank" rel="noopener noreferrer">GitHub</a>.
+          FitPic is built and maintained by PaltanLabs, a team focused on building free, privacy-first tools for Indian students and job seekers.
         </p>
       </div>
     </div>
