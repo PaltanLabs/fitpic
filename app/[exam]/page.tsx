@@ -11,6 +11,10 @@ import ExamToolClient from "./ExamToolClient";
 import { EXAM_CONTENT } from "@/lib/exam-content";
 import { HINDI_EXAM_CONTENT } from "@/lib/hindi-content";
 
+// Only allow precomputed exam slugs — prevents this route from
+// catching URLs meant for other static routes (e.g. /background-remover)
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return PRESETS.filter((p) => p.id !== "custom").map((p) => ({
     exam: getPresetSlug(p),
