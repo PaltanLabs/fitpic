@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SITE_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: `About ${SITE_NAME} — Free Photo & Signature Resizer for Govt Exams`,
+  title: `About FitPic — Free Photo & Signature Resizer for Govt Exams`,
   description: "FitPic is a free, privacy-first photo and signature resizer for Indian government exam applications. 100% browser-based, no signup required.",
   alternates: { canonical: "/about" },
 };

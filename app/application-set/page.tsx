@@ -3,7 +3,7 @@ import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import AppSetClient from "./AppSetClient";
 
 export const metadata: Metadata = {
-  title: `Complete Application Set — Photo + Signature + Thumb in One Go | ${SITE_NAME}`,
+  title: `Complete Application Set — Photo + Signature + Thumb in One Go`,
   description:
     "Upload all your exam documents at once. Resize photo, signature, and thumb impression for SSC, IBPS, UPSC, NEET, and 150+ exams. Download as ZIP. Free, browser-based.",
   keywords:

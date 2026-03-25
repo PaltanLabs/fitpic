@@ -3,6 +3,7 @@ import {
   generatePresetMetadata,
   generateJsonLd,
   generateFaqJsonLd,
+  generateHowToJsonLd,
   generateBreadcrumbJsonLd,
   getTypeLabel,
 } from "@/components/SEOHead";
@@ -64,6 +65,7 @@ export default function ExamPage({ params }: { params: { exam: string } }) {
   const slug = getPresetSlug(preset);
   const jsonLd = generateJsonLd(preset);
   const faqJsonLd = generateFaqJsonLd(preset);
+  const howToJsonLd = generateHowToJsonLd(preset);
   const breadcrumbJsonLd = generateBreadcrumbJsonLd(preset, slug);
   const parentPath = preset.type === "signature" ? "/signature-resizer" : "/photo-resizer";
   const parentName = preset.type === "signature" ? "Signature Resizer" : "Photo Resizer";
@@ -78,6 +80,10 @@ export default function ExamPage({ params }: { params: { exam: string } }) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
       />
       <script
         type="application/ld+json"
@@ -176,6 +182,24 @@ export default function ExamPage({ params }: { params: { exam: string } }) {
           </div>
         ))}
       </div>
+
+      {/* Cross-link: photo ↔ signature for same exam */}
+      {(() => {
+        const counterpartType = preset.type === "photo" ? "signature" : preset.type === "signature" ? "photo" : null;
+        const counterpart = counterpartType
+          ? PRESETS.find((p) => p.exam === preset.exam && p.type === counterpartType)
+          : null;
+        return counterpart ? (
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4">
+            <p className="text-neutral-300 text-sm">
+              {preset.type === "photo" ? "Need to resize your signature too?" : "Need to resize your photo too?"}{" "}
+              <a href={`/${getPresetSlug(counterpart)}`} className="text-yellow-400 hover:underline font-medium">
+                {counterpart.exam} {counterpartType === "photo" ? "Photo" : "Signature"} Resizer →
+              </a>
+            </p>
+          </div>
+        ) : null;
+      })()}
 
       {/* Related links — same category first */}
       <div className="space-y-2">

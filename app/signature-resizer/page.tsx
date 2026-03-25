@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { SITE_NAME } from "@/lib/constants";
+import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import { PRESETS, getPresetSlug } from "@/lib/presets";
 import SignatureResizerClient from "./SignatureResizerClient";
 
 export const metadata: Metadata = {
-  title: `Signature Resizer — Clean Up & Resize Signatures for Exams Free | ${SITE_NAME}`,
+  title: `Signature Resizer — Clean Up & Resize Signatures for Exams Free`,
   description:
     "Free online signature resizer for SSC, UPSC, IBPS, Railway, PAN Card. Auto-converts dark backgrounds to white, black ink optimized. Browser-based, no signup.",
   keywords:
@@ -29,9 +29,25 @@ const sigPresets = PRESETS.filter(
   (p) => p.type === "signature" && p.id !== "custom"
 );
 
+const signatureResizerJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Signature Resizer for Government Exams",
+  description: "Free online signature resizer for SSC, UPSC, IBPS, Railway, PAN Card. Auto-converts dark backgrounds to white, black ink optimized. Browser-based.",
+  url: `${SITE_URL}/signature-resizer`,
+  applicationCategory: "UtilitiesApplication",
+  operatingSystem: "Any",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+  browserRequirements: "Any modern browser",
+};
+
 export default function SignatureResizerPage() {
   return (
     <div className="space-y-6">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(signatureResizerJsonLd) }}
+      />
       <h1 className="text-2xl font-bold">Signature Resizer</h1>
       <p className="text-neutral-400 text-sm">
         Clean up and resize your signature. Auto-converts dark backgrounds to

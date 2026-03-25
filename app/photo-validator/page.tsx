@@ -3,7 +3,7 @@ import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import ValidatorClient from "./ValidatorClient";
 
 export const metadata: Metadata = {
-  title: `Photo Validator — Check Your Exam Photo Before Uploading | ${SITE_NAME}`,
+  title: `Photo Validator — Check Your Exam Photo Before Uploading`,
   description:
     "Free tool to check if your photo meets government exam requirements before uploading. Validates dimensions, file size, and format for SSC, UPSC, IBPS, NEET, and 150+ exams.",
   keywords:

@@ -4,7 +4,7 @@ import { PRESETS, getPresetSlug } from "@/lib/presets";
 import JoinerClient from "./JoinerClient";
 
 export const metadata: Metadata = {
-  title: `Photo + Signature Joiner — Combine for IBPS/SSC/RRB Upload Free | ${SITE_NAME}`,
+  title: `Photo + Signature Joiner — Combine for IBPS/SSC/RRB Upload Free`,
   description:
     "Free tool to combine photo and signature into one JPEG for IBPS, SSC, RRB exam uploads. Auto-resize and compress. Works on mobile, no signup.",
   keywords:

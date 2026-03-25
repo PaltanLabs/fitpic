@@ -3,7 +3,7 @@ import { BLOG_POSTS } from "@/lib/blog-posts";
 import { SITE_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: `Blog — Photo Resizing Guides & Exam Tips | ${SITE_NAME}`,
+  title: `Blog — Photo Resizing Guides & Exam Tips`,
   description:
     "Guides on exam photo requirements, how to resize photos for government exams, common rejection reasons, and tips for SSC, UPSC, IBPS, NEET, and more.",
   alternates: { canonical: "/blog" },

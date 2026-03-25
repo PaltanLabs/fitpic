@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SITE_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: `Privacy Policy | ${SITE_NAME}`,
+  title: `Privacy Policy`,
   description: "FitPic privacy policy. All photo processing happens in your browser. We never upload, store, or see your photos.",
   alternates: { canonical: "/privacy-policy" },
 };

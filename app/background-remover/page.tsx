@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import BgRemoverClient from "./BgRemoverClient";
 
-const title = `Remove Photo Background — Free Online Background Remover | ${SITE_NAME}`;
+const title = `Remove Photo Background — Free Online Background Remover`;
 const description =
   "Free online tool to remove photo background and replace with white. Perfect for government exam forms, passport photos, and ID cards. 100% browser-based, no uploads.";
 

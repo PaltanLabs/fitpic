@@ -32,7 +32,7 @@ const FAQ_ITEMS = [
 ];
 
 export const metadata: Metadata = {
-  title: `${SITE_NAME} — Free Photo & Signature Resizer for Govt Exams | SSC, UPSC, IBPS, NEET`,
+  title: `Free Photo & Signature Resizer for Govt Exams`,
   description:
     "Free online photo and signature resizer for Indian government exams. SSC, UPSC, IBPS, Railway, NEET, JEE, PAN, Aadhaar, Passport. Resize to exact KB and pixels. 100% browser-based, private, no signup.",
   keywords:

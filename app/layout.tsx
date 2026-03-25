@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SITE_NAME, GA_ID } from "@/lib/constants";
 import Script from "next/script";
+import Link from "next/link";
 import { PostHogProvider } from "@/components/PostHogProvider";
 
 export const metadata: Metadata = {
@@ -48,16 +49,16 @@ export default function RootLayout({
         <PostHogProvider>
           <header className="border-b border-neutral-800">
             <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-              <a href="/" className="font-bold text-yellow-400 text-lg">
+              <Link href="/" className="font-bold text-yellow-400 text-lg">
                 {SITE_NAME}
-              </a>
+              </Link>
               <nav className="flex gap-4 text-sm text-neutral-400">
-                <a href="/photo-resizer" className="hover:text-neutral-200">Photo</a>
-                <a href="/signature-resizer" className="hover:text-neutral-200">Signature</a>
-                <a href="/category/ssc" className="hover:text-neutral-200 hidden sm:inline">SSC</a>
-                <a href="/category/banking" className="hover:text-neutral-200 hidden sm:inline">Banking</a>
-                <a href="/category/state-psc" className="hover:text-neutral-200 hidden sm:inline">State PSC</a>
-                <a href="/blog" className="hover:text-neutral-200">Blog</a>
+                <Link href="/photo-resizer" className="hover:text-neutral-200">Photo</Link>
+                <Link href="/signature-resizer" className="hover:text-neutral-200">Signature</Link>
+                <Link href="/category/ssc" className="hover:text-neutral-200 hidden sm:inline">SSC</Link>
+                <Link href="/category/banking" className="hover:text-neutral-200 hidden sm:inline">Banking</Link>
+                <Link href="/category/state-psc" className="hover:text-neutral-200 hidden sm:inline">State PSC</Link>
+                <Link href="/blog" className="hover:text-neutral-200">Blog</Link>
               </nav>
             </div>
           </header>
@@ -70,34 +71,34 @@ export default function RootLayout({
                 <div className="space-y-2">
                   <h4 className="text-neutral-300 font-medium">Tools</h4>
                   <div className="space-y-1">
-                    <a href="/photo-resizer" className="block text-neutral-500 hover:text-neutral-300">Photo Resizer</a>
-                    <a href="/signature-resizer" className="block text-neutral-500 hover:text-neutral-300">Signature Resizer</a>
-                    <a href="/photo-signature-joiner" className="block text-neutral-500 hover:text-neutral-300">Photo + Signature Joiner</a>
-                    <a href="/name-date-stamp" className="block text-neutral-500 hover:text-neutral-300">Name & Date Stamp</a>
-                    <a href="/photo-validator" className="block text-neutral-500 hover:text-neutral-300">Photo Validator</a>
+                    <Link href="/photo-resizer" className="block text-neutral-500 hover:text-neutral-300">Photo Resizer</Link>
+                    <Link href="/signature-resizer" className="block text-neutral-500 hover:text-neutral-300">Signature Resizer</Link>
+                    <Link href="/photo-signature-joiner" className="block text-neutral-500 hover:text-neutral-300">Photo + Signature Joiner</Link>
+                    <Link href="/name-date-stamp" className="block text-neutral-500 hover:text-neutral-300">Name & Date Stamp</Link>
+                    <Link href="/photo-validator" className="block text-neutral-500 hover:text-neutral-300">Photo Validator</Link>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <h4 className="text-neutral-300 font-medium">Exams</h4>
                   <div className="space-y-1">
-                    <a href="/category/ssc" className="block text-neutral-500 hover:text-neutral-300">SSC</a>
-                    <a href="/category/upsc" className="block text-neutral-500 hover:text-neutral-300">UPSC</a>
-                    <a href="/category/banking" className="block text-neutral-500 hover:text-neutral-300">Banking</a>
-                    <a href="/category/state-psc" className="block text-neutral-500 hover:text-neutral-300">State PSC</a>
-                    <a href="/category/police" className="block text-neutral-500 hover:text-neutral-300">Police</a>
+                    <Link href="/category/ssc" className="block text-neutral-500 hover:text-neutral-300">SSC</Link>
+                    <Link href="/category/upsc" className="block text-neutral-500 hover:text-neutral-300">UPSC</Link>
+                    <Link href="/category/banking" className="block text-neutral-500 hover:text-neutral-300">Banking</Link>
+                    <Link href="/category/state-psc" className="block text-neutral-500 hover:text-neutral-300">State PSC</Link>
+                    <Link href="/category/police" className="block text-neutral-500 hover:text-neutral-300">Police</Link>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <h4 className="text-neutral-300 font-medium">Resources</h4>
                   <div className="space-y-1">
-                    <a href="/blog" className="block text-neutral-500 hover:text-neutral-300">Blog</a>
+                    <Link href="/blog" className="block text-neutral-500 hover:text-neutral-300">Blog</Link>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <h4 className="text-neutral-300 font-medium">Company</h4>
                   <div className="space-y-1">
-                    <a href="/about" className="block text-neutral-500 hover:text-neutral-300">About</a>
-                    <a href="/privacy-policy" className="block text-neutral-500 hover:text-neutral-300">Privacy Policy</a>
+                    <Link href="/about" className="block text-neutral-500 hover:text-neutral-300">About</Link>
+                    <Link href="/privacy-policy" className="block text-neutral-500 hover:text-neutral-300">Privacy Policy</Link>
                   </div>
                 </div>
               </div>

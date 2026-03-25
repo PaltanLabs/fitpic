@@ -3,7 +3,7 @@ import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import PdfCompressorClient from "./PdfCompressorClient";
 
 export const metadata: Metadata = {
-  title: `PDF Compressor — Compress PDF for Government Forms | ${SITE_NAME}`,
+  title: `PDF Compressor — Compress PDF for Government Forms`,
   description:
     "Free online PDF compressor for government exam forms. Reduce PDF size to 100KB, 200KB, 500KB for SSC, UPSC, IBPS applications. 100% browser-based, no upload to server.",
   keywords:

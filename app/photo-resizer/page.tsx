@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { SITE_NAME } from "@/lib/constants";
+import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import { PRESETS, getPresetSlug } from "@/lib/presets";
 import PhotoResizerClient from "./PhotoResizerClient";
 
 export const metadata: Metadata = {
-  title: `Photo Resizer for Govt Exams — Resize to Exact KB & Pixels Free | ${SITE_NAME}`,
+  title: `Photo Resizer for Govt Exams — Resize to Exact KB & Pixels Free`,
   description:
     "Free online photo resizer for SSC, UPSC, IBPS, Railway, NEET, PAN, Aadhaar, Passport. Auto-compress to exact KB and pixel size. 100% browser-based, no signup.",
   keywords:
@@ -29,9 +29,25 @@ const photoPresets = PRESETS.filter(
   (p) => (p.type === "photo" || p.type === "thumb") && p.id !== "custom"
 );
 
+const photoResizerJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Photo Resizer for Government Exams",
+  description: "Free online photo resizer for SSC, UPSC, IBPS, Railway, NEET, PAN, Aadhaar, Passport. Auto-compress to exact KB and pixel size. 100% browser-based.",
+  url: `${SITE_URL}/photo-resizer`,
+  applicationCategory: "UtilitiesApplication",
+  operatingSystem: "Any",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+  browserRequirements: "Any modern browser",
+};
+
 export default function PhotoResizerPage() {
   return (
     <div className="space-y-6">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(photoResizerJsonLd) }}
+      />
       <h1 className="text-2xl font-bold">Photo Resizer</h1>
       <p className="text-neutral-400 text-sm">
         Resize your photo to exact exam specifications. 100% client-side.

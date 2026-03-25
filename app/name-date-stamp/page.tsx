@@ -4,7 +4,7 @@ import { PRESETS, getPresetSlug } from "@/lib/presets";
 import NameDateClient from "./NameDateClient";
 
 export const metadata: Metadata = {
-  title: `Add Name & Date on Photo for SSC/IBPS — Free Online | ${SITE_NAME}`,
+  title: `Add Name & Date on Photo for SSC/IBPS — Free Online`,
   description:
     "Add name and date stamp on photo online free for SSC, IBPS, Railway exams. Add name and date of birth on photo for government form upload. Works on mobile, no signup.",
   keywords:

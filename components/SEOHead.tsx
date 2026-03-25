@@ -11,7 +11,7 @@ export function getTypeLabel(type: ExamPreset["type"]): string {
 export function generatePresetMetadata(preset: ExamPreset) {
   const typeLabel = getTypeLabel(preset.type);
   const slug = getPresetSlug(preset);
-  const title = `${preset.exam} ${typeLabel} Resizer - Resize to ${preset.maxKB}KB Free Online | ${SITE_NAME}`;
+  const title = `${preset.exam} ${typeLabel} Resizer - Resize to ${preset.maxKB}KB Free Online`;
   const description = `Free ${preset.exam} ${typeLabel.toLowerCase()} resizer. Resize to ${preset.width}x${preset.height}px, ${preset.minKB}-${preset.maxKB}KB. ${preset.bgColor ? "White background." : ""} Works on mobile. No signup.`;
 
   return {
@@ -42,7 +42,7 @@ export function generateJsonLd(preset: ExamPreset) {
     description: `Free online tool to resize ${typeLabel.toLowerCase()}s for ${preset.exam}. Auto-compress to ${preset.minKB}-${preset.maxKB}KB, ${preset.width}x${preset.height}px.`,
     applicationCategory: "UtilitiesApplication",
     operatingSystem: "Any",
-    offers: { "@type": "Offer", price: "0" },
+    offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
     browserRequirements: "Any modern browser",
   };
 }
@@ -83,6 +83,38 @@ export function generateFaqJsonLd(preset: ExamPreset) {
         text: f.answer,
       },
     })),
+  };
+}
+
+export function generateHowToJsonLd(preset: ExamPreset) {
+  const typeLabel = getTypeLabel(preset.type).toLowerCase();
+  return {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: `How to Resize Your ${typeLabel} for ${preset.exam}`,
+    description: `Step-by-step guide to resize your ${typeLabel} to ${preset.width}x${preset.height}px, ${preset.minKB}-${preset.maxKB}KB for ${preset.exam}.`,
+    step: [
+      {
+        "@type": "HowToStep",
+        name: `Select ${preset.exam}`,
+        text: `Open the ${preset.exam} ${typeLabel} resizer. The correct dimensions (${preset.width}x${preset.height}px) and file size limits (${preset.minKB}-${preset.maxKB}KB) are pre-configured.`,
+      },
+      {
+        "@type": "HowToStep",
+        name: `Upload your ${typeLabel}`,
+        text: `Click "Upload" or drag and drop your ${typeLabel}. Works with JPG, PNG, WebP, and HEIC formats.`,
+      },
+      {
+        "@type": "HowToStep",
+        name: "Download the resized file",
+        text: `Your ${typeLabel} is automatically resized to ${preset.width}x${preset.height}px and compressed to fit within ${preset.minKB}-${preset.maxKB}KB. Click "Download" to save.`,
+      },
+    ],
+    tool: {
+      "@type": "HowToTool",
+      name: "FitPic Online Resizer",
+    },
+    totalTime: "PT1M",
   };
 }
 
