@@ -2,18 +2,6 @@
 const nextConfig = {
   output: 'standalone',
 
-  // Permanent redirect non-www → www for SEO (fixes 307 → 308)
-  async redirects() {
-    return [
-      {
-        source: '/:path*',
-        has: [{ type: 'host', value: 'fitpic.in' }],
-        destination: 'https://www.fitpic.in/:path*',
-        permanent: true,
-      },
-    ];
-  },
-
   // Reverse-proxy PostHog through our domain so ad blockers don't block it
   async rewrites() {
     return [
