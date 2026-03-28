@@ -1,6 +1,14 @@
 {
   "framework": "nextjs",
   "regions": ["bom1"],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "fitpic.in" }],
+      "destination": "https://www.fitpic.in/:path*",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
