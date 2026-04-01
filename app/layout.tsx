@@ -3,7 +3,14 @@ import "./globals.css";
 import { SITE_NAME, GA_ID } from "@/lib/constants";
 import Script from "next/script";
 import Link from "next/link";
+import { Inter } from "next/font/google";
 import { PostHogProvider } from "@/components/PostHogProvider";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.fitpic.in"),
@@ -33,8 +40,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen bg-neutral-950 text-neutral-200 antialiased">
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <body className={`min-h-screen bg-surface-1 text-neutral-200 antialiased ${inter.className}`}>
         {GA_ID && (
           <>
             <Script
@@ -47,63 +54,75 @@ export default function RootLayout({
           </>
         )}
         <PostHogProvider>
-          <header className="border-b border-neutral-800">
-            <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-              <Link href="/" className="font-bold text-yellow-400 text-lg">
-                {SITE_NAME}
+          {/* Sticky Glass Header */}
+          <header className="header-glass sticky top-0 z-50">
+            <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+              <Link href="/" className="logo-shimmer font-bold text-lg relative">
+                <span className="gradient-text">{SITE_NAME}</span>
               </Link>
-              <nav className="flex gap-4 text-sm text-neutral-400">
-                <Link href="/photo-resizer" className="hover:text-neutral-200">Photo</Link>
-                <Link href="/signature-resizer" className="hover:text-neutral-200">Signature</Link>
-                <Link href="/category/ssc" className="hover:text-neutral-200 hidden sm:inline">SSC</Link>
-                <Link href="/category/banking" className="hover:text-neutral-200 hidden sm:inline">Banking</Link>
-                <Link href="/category/state-psc" className="hover:text-neutral-200 hidden sm:inline">State PSC</Link>
-                <Link href="/blog" className="hover:text-neutral-200">Blog</Link>
+              <nav className="flex gap-5 text-sm text-neutral-400">
+                <Link href="/photo-resizer" className="nav-link">Photo</Link>
+                <Link href="/signature-resizer" className="nav-link">Signature</Link>
+                <Link href="/category/ssc" className="nav-link hidden sm:inline">SSC</Link>
+                <Link href="/category/banking" className="nav-link hidden sm:inline">Banking</Link>
+                <Link href="/category/state-psc" className="nav-link hidden sm:inline">State PSC</Link>
+                <Link href="/blog" className="nav-link">Blog</Link>
               </nav>
             </div>
           </header>
 
-          <main className="max-w-2xl mx-auto px-4 py-6">{children}</main>
+          <main className="max-w-3xl mx-auto px-4 py-8">{children}</main>
 
-          <footer className="border-t border-neutral-800 mt-12">
-            <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-xs">
-                <div className="space-y-2">
-                  <h4 className="text-neutral-300 font-medium">Tools</h4>
-                  <div className="space-y-1">
-                    <Link href="/photo-resizer" className="block text-neutral-500 hover:text-neutral-300">Photo Resizer</Link>
-                    <Link href="/signature-resizer" className="block text-neutral-500 hover:text-neutral-300">Signature Resizer</Link>
-                    <Link href="/photo-signature-joiner" className="block text-neutral-500 hover:text-neutral-300">Photo + Signature Joiner</Link>
-                    <Link href="/name-date-stamp" className="block text-neutral-500 hover:text-neutral-300">Name & Date Stamp</Link>
-                    <Link href="/photo-validator" className="block text-neutral-500 hover:text-neutral-300">Photo Validator</Link>
+          {/* Polished Footer */}
+          <footer className="border-t border-neutral-800/50 mt-16">
+            <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 text-xs">
+                <div className="space-y-3">
+                  <h4 className="text-neutral-200 font-semibold text-sm">Tools</h4>
+                  <div className="space-y-2">
+                    <Link href="/photo-resizer" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Photo Resizer</Link>
+                    <Link href="/signature-resizer" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Signature Resizer</Link>
+                    <Link href="/photo-signature-joiner" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Photo + Signature Joiner</Link>
+                    <Link href="/name-date-stamp" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Name & Date Stamp</Link>
+                    <Link href="/photo-validator" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Photo Validator</Link>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="text-neutral-300 font-medium">Exams</h4>
-                  <div className="space-y-1">
-                    <Link href="/category/ssc" className="block text-neutral-500 hover:text-neutral-300">SSC</Link>
-                    <Link href="/category/upsc" className="block text-neutral-500 hover:text-neutral-300">UPSC</Link>
-                    <Link href="/category/banking" className="block text-neutral-500 hover:text-neutral-300">Banking</Link>
-                    <Link href="/category/state-psc" className="block text-neutral-500 hover:text-neutral-300">State PSC</Link>
-                    <Link href="/category/police" className="block text-neutral-500 hover:text-neutral-300">Police</Link>
+                <div className="space-y-3">
+                  <h4 className="text-neutral-200 font-semibold text-sm">Exams</h4>
+                  <div className="space-y-2">
+                    <Link href="/category/ssc" className="block text-neutral-500 hover:text-neutral-300 transition-colors">SSC</Link>
+                    <Link href="/category/upsc" className="block text-neutral-500 hover:text-neutral-300 transition-colors">UPSC</Link>
+                    <Link href="/category/banking" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Banking</Link>
+                    <Link href="/category/state-psc" className="block text-neutral-500 hover:text-neutral-300 transition-colors">State PSC</Link>
+                    <Link href="/category/police" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Police</Link>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="text-neutral-300 font-medium">Resources</h4>
-                  <div className="space-y-1">
-                    <Link href="/blog" className="block text-neutral-500 hover:text-neutral-300">Blog</Link>
+                <div className="space-y-3">
+                  <h4 className="text-neutral-200 font-semibold text-sm">Resources</h4>
+                  <div className="space-y-2">
+                    <Link href="/blog" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Blog</Link>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="text-neutral-300 font-medium">Company</h4>
-                  <div className="space-y-1">
-                    <Link href="/about" className="block text-neutral-500 hover:text-neutral-300">About</Link>
-                    <Link href="/privacy-policy" className="block text-neutral-500 hover:text-neutral-300">Privacy Policy</Link>
+                <div className="space-y-3">
+                  <h4 className="text-neutral-200 font-semibold text-sm">Company</h4>
+                  <div className="space-y-2">
+                    <Link href="/about" className="block text-neutral-500 hover:text-neutral-300 transition-colors">About</Link>
+                    <Link href="/privacy-policy" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Privacy Policy</Link>
                   </div>
                 </div>
               </div>
-              <div className="text-center text-neutral-600 text-xs space-y-2 pt-4 border-t border-neutral-800">
-                <p>All processing happens in your browser. We never see or store your photos.</p>
+
+              {/* Privacy strip */}
+              <div className="footer-privacy text-center rounded-xl bg-neutral-900/50 border border-emerald-500/10 px-4 py-3">
+                <p className="text-emerald-400/80 text-xs flex items-center justify-center gap-2">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  All processing happens in your browser. We never see or store your photos.
+                </p>
+              </div>
+
+              <div className="text-center text-neutral-600 text-xs pt-2">
                 <p>&copy; {new Date().getFullYear()} {SITE_NAME}</p>
               </div>
             </div>

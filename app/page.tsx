@@ -3,6 +3,10 @@ import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import { PRESETS, getPresetSlug, CATEGORIES } from "@/lib/presets";
 import AdSlot from "@/components/AdSlot";
 import TrustBadge from "@/components/TrustBadge";
+import ScrollAnimations from "@/components/ScrollAnimations";
+import AnimatedHowItWorks from "@/components/AnimatedHowItWorks";
+import FeatureGrid from "@/components/FeatureGrid";
+import AnimatedDemo from "@/components/AnimatedDemo";
 
 const FAQ_ITEMS = [
   {
@@ -62,182 +66,209 @@ const examsByCategory = CATEGORIES.filter((c) => c !== "Custom").map((cat) => ({
 
 export default function HomePage() {
   return (
-    <div className="space-y-8">
-      {/* Hero */}
-      <div className="text-center space-y-3 py-6">
-        <h1 className="text-3xl font-bold text-neutral-100">
-          Free Photo & Signature Resizer
-        </h1>
-        <p className="text-neutral-400 max-w-md mx-auto">
-          Resize photos and signatures for Indian government exams. SSC, UPSC,
-          IBPS, Railway, NEET, JEE, PAN, Aadhaar, Passport & more.
+    <div className="space-y-16">
+      <ScrollAnimations />
+
+      {/* ===== Hero ===== */}
+      <section className="hero-bg dot-grid text-center space-y-5 py-12 -mx-4 px-4 rounded-3xl relative">
+        <div data-animate="fade-up">
+          <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight">
+            Exam Ready Photos in{" "}
+            <span className="gradient-text-animated">Seconds</span>
+          </h1>
+        </div>
+
+        <p
+          className="text-neutral-400 max-w-lg mx-auto text-base leading-relaxed"
+          data-animate="fade-up"
+          data-delay="1"
+        >
+          Automatically resize and compress photos & signatures for{" "}
+          <span className="text-neutral-300 font-medium">SSC, UPSC, IBPS, Railway, NEET, JEE</span>,
+          PAN, Aadhaar, Passport & 100+ more exams.{" "}
+          <span className="text-emerald-400 font-medium">100% Free & Private.</span>
         </p>
-        <TrustBadge />
-        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+
+        <div data-animate="fade-up" data-delay="2">
+          <TrustBadge />
+        </div>
+
+        <div
+          className="flex flex-col sm:flex-row gap-3 justify-center pt-3"
+          data-animate="fade-up"
+          data-delay="3"
+        >
           <a
             href="/photo-resizer"
-            className="px-6 py-3 rounded-xl bg-yellow-400 text-neutral-900 font-bold text-center hover:bg-yellow-300 transition-colors"
+            className="btn-glow px-8 py-3.5 rounded-xl bg-yellow-400 text-neutral-900 font-bold text-center text-sm"
           >
-            Resize Photo Now
+            Resize Photo Now →
           </a>
           <a
             href="/signature-resizer"
-            className="px-6 py-3 rounded-xl bg-neutral-800 text-neutral-200 font-bold text-center hover:bg-neutral-700 transition-colors border border-neutral-700"
+            className="btn-glow px-8 py-3.5 rounded-xl bg-neutral-800/80 text-neutral-200 font-bold text-center text-sm border border-neutral-700 hover:border-neutral-500"
           >
             Resize Signature
           </a>
         </div>
-      </div>
+      </section>
 
       <AdSlot slot="top-banner" format="horizontal" />
 
-      {/* Tool cards */}
-      <div className="grid gap-4">
-        <a
-          href="/photo-resizer"
-          className="block p-6 rounded-2xl bg-neutral-900 border border-neutral-800 hover:border-yellow-400/50 transition-colors"
-        >
-          <div className="text-2xl mb-2">📷</div>
-          <h2 className="text-xl font-bold text-neutral-100">Photo Resizer</h2>
-          <p className="text-neutral-400 text-sm mt-1">
-            Resize passport photos for any exam. Auto-compress to exact KB and
-            pixel requirements.
-          </p>
-        </a>
-
-        <a
-          href="/signature-resizer"
-          className="block p-6 rounded-2xl bg-neutral-900 border border-neutral-800 hover:border-yellow-400/50 transition-colors"
-        >
-          <div className="text-2xl mb-2">✍️</div>
-          <h2 className="text-xl font-bold text-neutral-100">
-            Signature Resizer
-          </h2>
-          <p className="text-neutral-400 text-sm mt-1">
-            Clean up and resize signatures. Handles dark backgrounds, auto-converts to
-            black ink on white.
-          </p>
-        </a>
-
-        <a
-          href="/photo-signature-joiner"
-          className="block p-6 rounded-2xl bg-neutral-900 border border-neutral-800 hover:border-yellow-400/50 transition-colors"
-        >
-          <div className="text-2xl mb-2">🖼️</div>
-          <h2 className="text-xl font-bold text-neutral-100">
-            Photo + Signature Joiner
-          </h2>
-          <p className="text-neutral-400 text-sm mt-1">
-            Combine photo and signature into a single image for IBPS/SSC/RRB uploads.
-          </p>
-        </a>
-      </div>
-
-      {/* How It Works */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-bold text-neutral-300">How It Works</h2>
+      {/* ===== Tool Cards ===== */}
+      <section className="space-y-6" data-animate="fade-up">
+        <h2 className="text-2xl font-bold text-neutral-100">Our Tools</h2>
         <div className="grid gap-4 sm:grid-cols-3">
-          <div className="bg-neutral-900 rounded-xl p-4">
-            <div className="text-yellow-400 font-bold text-lg mb-1">1</div>
-            <h3 className="text-neutral-200 font-medium text-sm">Choose Your Exam</h3>
-            <p className="text-neutral-500 text-xs mt-1">
-              Select from 150+ exam presets (SSC, UPSC, IBPS, Railway, NEET, PAN,
-              Aadhaar, Passport) or enter custom dimensions.
+          <a
+            href="/photo-resizer"
+            className="glass-card rounded-2xl p-6 block group"
+            data-animate="fade-up"
+            data-delay="1"
+          >
+            <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-3 group-hover:bg-blue-500/20 transition-colors">
+              <svg className="w-5 h-5 text-blue-400 feature-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-neutral-100">Photo Resizer</h3>
+            <p className="text-neutral-400 text-sm mt-1.5 leading-relaxed">
+              Resize passport photos for any exam. Auto-compress to exact KB and pixel requirements.
             </p>
-          </div>
-          <div className="bg-neutral-900 rounded-xl p-4">
-            <div className="text-yellow-400 font-bold text-lg mb-1">2</div>
-            <h3 className="text-neutral-200 font-medium text-sm">Upload Your Photo or Signature</h3>
-            <p className="text-neutral-500 text-xs mt-1">
-              Works with JPG, PNG, WebP, HEIC. Take a photo directly from your
-              phone camera.
-            </p>
-          </div>
-          <div className="bg-neutral-900 rounded-xl p-4">
-            <div className="text-yellow-400 font-bold text-lg mb-1">3</div>
-            <h3 className="text-neutral-200 font-medium text-sm">Download the Resized File</h3>
-            <p className="text-neutral-500 text-xs mt-1">
-              Automatically resized to exact pixel dimensions and compressed to
-              the required KB range. Ready to upload to the exam form.
-            </p>
-          </div>
-        </div>
-      </div>
+          </a>
 
-      {/* Supported Exams — expanded with links and sizes */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-bold text-neutral-300">
+          <a
+            href="/signature-resizer"
+            className="glass-card rounded-2xl p-6 block group"
+            data-animate="fade-up"
+            data-delay="2"
+          >
+            <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center mb-3 group-hover:bg-purple-500/20 transition-colors">
+              <svg className="w-5 h-5 text-purple-400 feature-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-neutral-100">Signature Resizer</h3>
+            <p className="text-neutral-400 text-sm mt-1.5 leading-relaxed">
+              Clean up and resize signatures. Handles dark backgrounds, auto-converts to black ink on white.
+            </p>
+          </a>
+
+          <a
+            href="/photo-signature-joiner"
+            className="glass-card rounded-2xl p-6 block group"
+            data-animate="fade-up"
+            data-delay="3"
+          >
+            <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center mb-3 group-hover:bg-amber-500/20 transition-colors">
+              <svg className="w-5 h-5 text-amber-400 feature-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a2.25 2.25 0 002.25-2.25V5.25a2.25 2.25 0 00-2.25-2.25H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-neutral-100">Photo + Signature Joiner</h3>
+            <p className="text-neutral-400 text-sm mt-1.5 leading-relaxed">
+              Combine photo and signature into a single image for IBPS/SSC/RRB uploads.
+            </p>
+          </a>
+        </div>
+      </section>
+
+      {/* ===== Animated Demo ===== */}
+      <AnimatedDemo />
+
+      {/* ===== How It Works ===== */}
+      <AnimatedHowItWorks />
+
+      {/* ===== Feature Grid ===== */}
+      <FeatureGrid />
+
+      <AdSlot slot="mid-banner" format="horizontal" />
+
+      {/* ===== Supported Exams ===== */}
+      <section className="space-y-4" data-animate="fade-up">
+        <h2 className="text-2xl font-bold text-neutral-100">
           Supported Exam Formats
         </h2>
-        {examsByCategory.map(({ category, presets }) => (
-          <details key={category} className="group">
-            <summary className="text-neutral-400 text-sm font-medium cursor-pointer hover:text-neutral-200 py-1">
-              {category} ({presets.length} presets)
-            </summary>
-            <div className="overflow-x-auto mt-2">
-              <table className="w-full text-xs text-left">
-                <thead>
-                  <tr className="text-neutral-500 border-b border-neutral-800">
-                    <th className="py-1.5 pr-4">Exam</th>
-                    <th className="py-1.5 pr-4">Type</th>
-                    <th className="py-1.5 pr-4">Size</th>
-                    <th className="py-1.5">KB Range</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {presets.map((p) => (
-                    <tr key={p.id} className="border-b border-neutral-900">
-                      <td className="py-1.5 pr-4">
-                        <a
-                          href={`/${getPresetSlug(p)}`}
-                          className="text-yellow-400 hover:underline"
-                        >
-                          {p.name}
-                        </a>
-                      </td>
-                      <td className="py-1.5 pr-4 text-neutral-400">
-                        {p.type === "photo"
-                          ? "Photo"
-                          : p.type === "thumb"
-                          ? "Thumb Impression"
-                          : "Signature"}
-                      </td>
-                      <td className="py-1.5 pr-4 text-neutral-400">
-                        {p.width}x{p.height}px
-                      </td>
-                      <td className="py-1.5 text-neutral-400">
-                        {p.minKB}-{p.maxKB}KB
-                      </td>
+        <p className="text-neutral-500 text-sm">
+          We automatically handle the exact specifications for each exam.
+        </p>
+        <div className="space-y-3">
+          {examsByCategory.map(({ category, presets }) => (
+            <details key={category} className="group glass-card rounded-xl overflow-hidden">
+              <summary className="px-5 py-3.5 cursor-pointer text-sm font-medium text-neutral-300 hover:text-yellow-400 transition-colors flex items-center justify-between">
+                <span>{category} <span className="text-neutral-600 font-normal">({presets.length} presets)</span></span>
+                <svg className="w-4 h-4 text-neutral-500 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </summary>
+              <div className="overflow-x-auto px-5 pb-4">
+                <table className="w-full text-xs text-left">
+                  <thead>
+                    <tr className="text-neutral-500 border-b border-neutral-800">
+                      <th className="py-2 pr-4 font-medium">Exam</th>
+                      <th className="py-2 pr-4 font-medium">Type</th>
+                      <th className="py-2 pr-4 font-medium">Size</th>
+                      <th className="py-2 font-medium">KB Range</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </details>
-        ))}
-      </div>
+                  </thead>
+                  <tbody>
+                    {presets.map((p) => (
+                      <tr key={p.id} className="border-b border-neutral-800/50 hover:bg-neutral-800/30 transition-colors">
+                        <td className="py-2 pr-4">
+                          <a
+                            href={`/${getPresetSlug(p)}`}
+                            className="text-yellow-400 hover:underline"
+                          >
+                            {p.name}
+                          </a>
+                        </td>
+                        <td className="py-2 pr-4 text-neutral-400">
+                          {p.type === "photo"
+                            ? "Photo"
+                            : p.type === "thumb"
+                            ? "Thumb Impression"
+                            : "Signature"}
+                        </td>
+                        <td className="py-2 pr-4 text-neutral-400">
+                          {p.width}x{p.height}px
+                        </td>
+                        <td className="py-2 text-neutral-400">
+                          {p.minKB}-{p.maxKB}KB
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
 
-      {/* FAQ */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-bold text-neutral-300">
+      {/* ===== FAQ ===== */}
+      <section className="space-y-4" data-animate="fade-up">
+        <h2 className="text-2xl font-bold text-neutral-100">
           Frequently Asked Questions
         </h2>
         <div className="space-y-3">
           {FAQ_ITEMS.map((item, i) => (
             <details
               key={i}
-              className="bg-neutral-900 rounded-xl border border-neutral-800 group"
+              className="glass-card rounded-xl group overflow-hidden"
             >
-              <summary className="px-4 py-3 cursor-pointer text-sm font-medium text-neutral-200 hover:text-yellow-400 transition-colors">
+              <summary className="px-5 py-3.5 cursor-pointer text-sm font-medium text-neutral-200 hover:text-yellow-400 transition-colors flex items-center justify-between">
                 {item.question}
+                <svg className="w-4 h-4 text-neutral-500 transition-transform group-open:rotate-180 flex-shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
               </summary>
-              <p className="px-4 pb-3 text-neutral-400 text-sm leading-relaxed">
+              <p className="px-5 pb-4 text-neutral-400 text-sm leading-relaxed">
                 {item.answer}
               </p>
             </details>
           ))}
         </div>
-      </div>
+      </section>
 
       <AdSlot slot="bottom-rect" format="rectangle" />
 
