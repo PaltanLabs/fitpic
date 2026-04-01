@@ -14,6 +14,7 @@ import {
   DEFAULT_CROP_BIAS_Y,
   getPhotoToolPresetState,
 } from "@/lib/photoToolState";
+import { trackUpload, trackProcessComplete, trackProcessError } from "@/lib/analytics";
 
 interface Props {
   presetId: string;
@@ -40,7 +41,14 @@ export default function ExamToolClient({ presetId }: Props) {
     setResult(null);
     setWhiteBgError(null);
     setWhiteBgDurationMs(null);
-  }, []);
+    trackUpload({
+      tool: isSignature ? "signature_resizer" : "photo_resizer",
+      file_type: f.type,
+      file_size_kb: Math.round(f.size / 1024),
+      preset_id: preset.id,
+      exam_name: preset.exam,
+    });
+  }, [preset, isSignature]);
 
   const handleResize = async () => {
     if (!image) return;
@@ -78,6 +86,16 @@ export default function ExamToolClient({ presetId }: Props) {
         cropBiasY,
       });
       setResult(res);
+      trackProcessComplete({
+        tool: isSignature ? "signature_resizer" : "photo_resizer",
+        preset_id: preset.id,
+        exam_name: preset.exam,
+        result_size_kb: res.sizeKB,
+        result_width: res.width,
+        result_height: res.height,
+        quality: res.quality,
+        validation_passed: res.sizeKB >= preset.minKB && res.sizeKB <= preset.maxKB,
+      });
     } finally {
       setProcessing(false);
     }

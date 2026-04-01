@@ -17,6 +17,7 @@ import {
   getPhotoToolCategoryResetState,
   getPhotoToolPresetState,
 } from "@/lib/photoToolState";
+import { trackUpload, trackProcessComplete, trackPresetSelected, trackProcessError } from "@/lib/analytics";
 
 export default function PhotoResizerClient() {
   const [preset, setPreset] = useState<ExamPreset | null>(null);
@@ -42,8 +43,15 @@ export default function PhotoResizerClient() {
       setResult(null);
       setWhiteBgError(null);
       setWhiteBgDurationMs(null);
+      trackUpload({
+        tool: "photo_resizer",
+        file_type: f.type,
+        file_size_kb: Math.round(f.size / 1024),
+        preset_id: preset?.id,
+        exam_name: preset?.exam,
+      });
     },
-    []
+    [preset]
   );
 
   const handleResize = async () => {
@@ -75,6 +83,16 @@ export default function PhotoResizerClient() {
         cropBiasY,
       });
       setResult(res);
+      trackProcessComplete({
+        tool: "photo_resizer",
+        preset_id: preset.id,
+        exam_name: preset.exam,
+        result_size_kb: res.sizeKB,
+        result_width: res.width,
+        result_height: res.height,
+        quality: res.quality,
+        validation_passed: res.sizeKB >= preset.minKB && res.sizeKB <= preset.maxKB,
+      });
     } finally {
       setProcessing(false);
     }
@@ -115,6 +133,7 @@ export default function PhotoResizerClient() {
         onSelect={(p) => {
           clearUploadState();
           setPreset(p);
+          trackPresetSelected({ tool: "photo_resizer", preset_id: p.id, exam_name: p.exam, preset_type: p.type });
           const next = getPhotoToolPresetState(p.requiresDateStamp);
           setDateStampEnabled(next.dateStampEnabled);
           setDateStamp(next.dateStamp);

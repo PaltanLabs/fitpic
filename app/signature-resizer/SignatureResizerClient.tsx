@@ -8,6 +8,7 @@ import AdSlot from "@/components/AdSlot";
 import Tips from "@/components/Tips";
 import { type ExamPreset } from "@/lib/presets";
 import { processImage, type ProcessResult } from "@/lib/imageEngine";
+import { trackUpload, trackProcessComplete, trackPresetSelected, trackProcessError } from "@/lib/analytics";
 
 export default function SignatureResizerClient() {
   const [preset, setPreset] = useState<ExamPreset | null>(null);
@@ -22,8 +23,15 @@ export default function SignatureResizerClient() {
       setImage(img);
       setFile(f);
       setResult(null);
+      trackUpload({
+        tool: "signature_resizer",
+        file_type: f.type,
+        file_size_kb: Math.round(f.size / 1024),
+        preset_id: preset?.id,
+        exam_name: preset?.exam,
+      });
     },
-    []
+    [preset]
   );
 
   const handleResize = async () => {
@@ -40,6 +48,15 @@ export default function SignatureResizerClient() {
         signatureMode: true,
       });
       setResult(res);
+      trackProcessComplete({
+        tool: "signature_resizer",
+        preset_id: preset.id,
+        exam_name: preset.exam,
+        result_size_kb: res.sizeKB,
+        result_width: res.width,
+        result_height: res.height,
+        quality: res.quality,
+      });
     } finally {
       setProcessing(false);
     }
@@ -72,6 +89,7 @@ export default function SignatureResizerClient() {
         onSelect={(p) => {
           clearUploadState();
           setPreset(p);
+          trackPresetSelected({ tool: "signature_resizer", preset_id: p.id, exam_name: p.exam, preset_type: p.type });
           setUploaderKey((k) => k + 1);
         }}
       />

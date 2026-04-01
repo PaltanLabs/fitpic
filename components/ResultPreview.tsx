@@ -3,6 +3,7 @@
 import { type ProcessResult } from "@/lib/imageEngine";
 import { type ExamPreset } from "@/lib/presets";
 import { validateOutput, type ValidationResult } from "@/lib/validators";
+import { trackDownload } from "@/lib/analytics";
 
 interface Props {
   result: ProcessResult;
@@ -15,6 +16,12 @@ export default function ResultPreview({ result, preset, originalSize }: Props) {
   const downloadName = `${preset.id.replace(/-/g, "_")}_${preset.type}.jpg`;
 
   const handleDownload = () => {
+    trackDownload({
+      tool: preset.type === "signature" ? "signature_resizer" : "photo_resizer",
+      preset_id: preset.id,
+      exam_name: preset.exam,
+      file_size_kb: result.sizeKB,
+    });
     const a = document.createElement("a");
     a.href = result.dataUrl;
     a.download = downloadName;

@@ -4,6 +4,7 @@ import { useState } from "react";
 import ImageUploader from "@/components/ImageUploader";
 import AdSlot from "@/components/AdSlot";
 import { processImage } from "@/lib/imageEngine";
+import { trackUpload, trackProcessComplete, trackDownload, trackProcessError } from "@/lib/analytics";
 
 interface JoinerLayout {
   id: string;
@@ -154,12 +155,11 @@ export default function JoinerClient() {
       setResult(compressed.dataUrl);
       setResultKB(compressed.sizeKB);
       setResultQuality(compressed.qualityPercent);
+      trackProcessComplete({ tool: "photo_signature_joiner", result_size_kb: compressed.sizeKB });
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Could not combine the images. Please try again."
-      );
+      const errMsg = err instanceof Error ? err.message : "Could not combine the images. Please try again.";
+      setError(errMsg);
+      trackProcessError({ tool: "photo_signature_joiner", error_message: errMsg });
     } finally {
       setProcessing(false);
     }
@@ -167,6 +167,7 @@ export default function JoinerClient() {
 
   const handleDownload = () => {
     if (!result) return;
+    trackDownload({ tool: "photo_signature_joiner", file_size_kb: resultKB });
     const a = document.createElement("a");
     a.href = result;
     a.download = `${selectedLayout.id}_photo_signature.jpg`;
@@ -209,6 +210,7 @@ export default function JoinerClient() {
             setPhoto(img);
             setResult(null);
             setError(null);
+            trackUpload({ tool: "photo_signature_joiner", file_type: "photo", file_size_kb: 0 });
           }}
           label="Upload Photo"
         />
@@ -222,6 +224,7 @@ export default function JoinerClient() {
             setSignature(img);
             setResult(null);
             setError(null);
+            trackUpload({ tool: "photo_signature_joiner", file_type: "signature", file_size_kb: 0 });
           }}
           label="Upload Signature"
         />

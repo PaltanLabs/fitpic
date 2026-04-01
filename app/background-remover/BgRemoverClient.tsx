@@ -5,6 +5,7 @@ import ImageUploader from "@/components/ImageUploader";
 import { makeWhiteBackground } from "@/lib/whiteBackground";
 import { PRESETS } from "@/lib/presets";
 import { processImage } from "@/lib/imageEngine";
+import { trackUpload, trackProcessComplete, trackDownload, trackProcessError } from "@/lib/analytics";
 
 type Stage = "idle" | "processing" | "done" | "error";
 
@@ -29,6 +30,7 @@ export default function BgRemoverClient() {
       setOriginalSrc(img.src);
       sourceImageRef.current = img;
       setResultSrc(null);
+      trackUpload({ tool: "background_remover", file_type: "image", file_size_kb: 0, preset_id: selectedPreset || undefined });
 
       try {
         const result = await makeWhiteBackground(img);
@@ -54,13 +56,12 @@ export default function BgRemoverClient() {
         setConfidence(result.confidence);
         setDurationMs(result.durationMs);
         setStage("done");
+        trackProcessComplete({ tool: "background_remover", duration_ms: result.durationMs, preset_id: selectedPreset || undefined });
       } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Failed to remove background. Please try a different photo."
-        );
+        const errMsg = err instanceof Error ? err.message : "Failed to remove background. Please try a different photo.";
+        setError(errMsg);
         setStage("error");
+        trackProcessError({ tool: "background_remover", error_message: errMsg });
       }
     },
     [selectedPreset]
@@ -68,6 +69,7 @@ export default function BgRemoverClient() {
 
   const handleDownload = () => {
     if (!resultSrc) return;
+    trackDownload({ tool: "background_remover", preset_id: selectedPreset || undefined });
     const a = document.createElement("a");
     a.href = resultSrc;
     a.download = "white-background.png";
