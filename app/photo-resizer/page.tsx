@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import { PRESETS, getPresetSlug } from "@/lib/presets";
 import PhotoResizerClient from "./PhotoResizerClient";
+import TrustBadge from "@/components/TrustBadge";
 
 export const metadata: Metadata = {
   title: `Photo Resizer for Govt Exams — Resize to Exact KB & Pixels Free`,
@@ -53,6 +54,7 @@ export default function PhotoResizerPage() {
       <p className="text-neutral-400 text-sm">
         Resize your photo to exact exam specifications. 100% client-side.
       </p>
+      <TrustBadge />
 
       <PhotoResizerClient />
 

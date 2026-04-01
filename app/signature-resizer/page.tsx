@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import { PRESETS, getPresetSlug } from "@/lib/presets";
 import SignatureResizerClient from "./SignatureResizerClient";
+import TrustBadge from "@/components/TrustBadge";
 
 export const metadata: Metadata = {
   title: `Signature Resizer — Clean Up & Resize Signatures for Exams Free`,
@@ -54,6 +55,7 @@ export default function SignatureResizerPage() {
         Clean up and resize your signature. Auto-converts dark backgrounds to
         white. Black ink optimized.
       </p>
+      <TrustBadge />
 
       <SignatureResizerClient />
 
