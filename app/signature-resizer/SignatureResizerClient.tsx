@@ -125,7 +125,12 @@ export default function SignatureResizerClient() {
             disabled={processing}
             className="w-full py-3 rounded-xl bg-yellow-400 text-neutral-900 font-bold text-center hover:bg-yellow-300 transition-colors disabled:opacity-50"
           >
-            {processing ? "Processing..." : "Resize & Compress Now"}
+            {processing ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-neutral-900 border-t-transparent rounded-full animate-spin" />
+                Processing...
+              </span>
+            ) : "Resize & Compress Now"}
           </button>
         </div>
       )}
