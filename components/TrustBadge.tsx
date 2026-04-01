@@ -1,19 +1,17 @@
 export default function TrustBadge() {
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-xs text-neutral-400">
-      <span className="flex items-center gap-1.5">
+    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-neutral-400">
+      <span className="flex items-center gap-1">
         <span className="text-emerald-400">&#x2713;</span>
-        100% browser-based — photos never leave your device
+        Photos never leave your device
       </span>
-      <span className="hidden sm:inline text-neutral-700">|</span>
-      <span className="flex items-center gap-1.5">
+      <span className="flex items-center gap-1">
         <span className="text-emerald-400">&#x2713;</span>
-        Free forever — no signup, no limits
+        Free — no signup, no limits
       </span>
-      <span className="hidden sm:inline text-neutral-700">|</span>
-      <span className="flex items-center gap-1.5">
+      <span className="flex items-center gap-1">
         <span className="text-emerald-400">&#x2713;</span>
-        Used by SSC, UPSC, IBPS exam aspirants
+        150+ exam presets
       </span>
     </div>
   );

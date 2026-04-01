@@ -72,10 +72,6 @@ export default function HomePage() {
           Resize photos and signatures for Indian government exams. SSC, UPSC,
           IBPS, Railway, NEET, JEE, PAN, Aadhaar, Passport & more.
         </p>
-        <div className="flex items-center justify-center gap-2 text-emerald-400 text-sm">
-          <span>🔒</span>
-          <span>100% browser-based — we never see your photos</span>
-        </div>
         <TrustBadge />
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
           <a
