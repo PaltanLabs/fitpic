@@ -170,28 +170,29 @@ body {
 }
 
 /* ===== Scroll Animations ===== */
-[data-animate] {
+/* Only hide elements after JS has loaded (.scroll-ready on <html>) */
+.scroll-ready [data-animate] {
   opacity: 0;
   transform: translateY(24px);
   transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
               transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-[data-animate].visible {
+.scroll-ready [data-animate].visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-[data-animate="fade-up"] { transform: translateY(24px); }
-[data-animate="fade-up"].visible { transform: translateY(0); }
+.scroll-ready [data-animate="fade-up"] { transform: translateY(24px); }
+.scroll-ready [data-animate="fade-up"].visible { transform: translateY(0); }
 
-[data-animate="fade-in"] { transform: translateY(0); }
+.scroll-ready [data-animate="fade-in"] { transform: translateY(0); }
 
-[data-animate="scale-in"] {
+.scroll-ready [data-animate="scale-in"] {
   transform: scale(0.95);
   opacity: 0;
 }
-[data-animate="scale-in"].visible {
+.scroll-ready [data-animate="scale-in"].visible {
   transform: scale(1);
   opacity: 1;
 }

@@ -6,13 +6,16 @@ export default function ScrollAnimations() {
   useEffect(() => {
     const elements = document.querySelectorAll("[data-animate]");
 
-    // Immediately reveal elements already in viewport (above the fold)
+    // Mark elements already in viewport as visible BEFORE enabling animations
     elements.forEach((el) => {
       const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight) {
+      if (rect.top < window.innerHeight + 50) {
         el.classList.add("visible");
       }
     });
+
+    // Now enable animation CSS (elements not yet visible will animate on scroll)
+    document.documentElement.classList.add("scroll-ready");
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -35,15 +38,7 @@ export default function ScrollAnimations() {
       }
     });
 
-    // Safety net: reveal everything after 2s in case observer never fires
-    const fallback = setTimeout(() => {
-      elements.forEach((el) => el.classList.add("visible"));
-    }, 2000);
-
-    return () => {
-      observer.disconnect();
-      clearTimeout(fallback);
-    };
+    return () => observer.disconnect();
   }, []);
 
   return null;
