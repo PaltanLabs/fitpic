@@ -75,8 +75,6 @@ export default function SignatureResizerClient() {
 
   return (
     <div className="space-y-6">
-      <AdSlot slot="sig-top" format="horizontal" />
-
       {/* Step 1: Select Exam */}
       <ExamPresetSelector
         type="signature"
@@ -93,6 +91,8 @@ export default function SignatureResizerClient() {
           setUploaderKey((k) => k + 1);
         }}
       />
+
+      <AdSlot slot="sig-top" format="horizontal" />
 
       {/* Step 2: Upload */}
       {preset && (

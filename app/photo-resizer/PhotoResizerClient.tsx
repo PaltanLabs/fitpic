@@ -34,12 +34,14 @@ export default function PhotoResizerClient() {
   const [whiteBgDurationMs, setWhiteBgDurationMs] = useState<number | null>(null);
   const [result, setResult] = useState<ProcessResult | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleImageLoad = useCallback(
     (img: HTMLImageElement, f: File) => {
       setImage(img);
       setFile(f);
       setResult(null);
+      setError(null);
       setWhiteBgError(null);
       setWhiteBgDurationMs(null);
       trackUpload({
@@ -97,6 +99,10 @@ export default function PhotoResizerClient() {
         quality: res.quality,
         validation_passed: res.sizeKB >= preset.minKB && res.sizeKB <= preset.maxKB,
       });
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : "Failed to resize photo. Please try a different image.";
+      setError(errMsg);
+      trackProcessError({ tool: "photo_resizer", error_message: errMsg, preset_id: preset?.id });
     } finally {
       setProcessing(false);
     }
@@ -115,8 +121,6 @@ export default function PhotoResizerClient() {
 
   return (
     <div className="space-y-6">
-      <AdSlot slot="photo-top" format="horizontal" />
-
       {/* Step 1: Select Exam */}
       <ExamPresetSelector
         type="photo"
@@ -149,6 +153,8 @@ export default function PhotoResizerClient() {
           setDateStamperKey((k) => k + 1);
         }}
       />
+
+      <AdSlot slot="photo-top" format="horizontal" />
 
       {/* Step 2: Upload */}
       {preset && (
@@ -202,6 +208,12 @@ export default function PhotoResizerClient() {
               )}
             </p>
           </div>
+
+          {error && (
+            <div className="bg-rose-400/10 border border-rose-400/30 text-rose-300 text-sm rounded-xl p-3">
+              {error}
+            </div>
+          )}
 
           <button
             onClick={handleResize}

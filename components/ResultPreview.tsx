@@ -96,7 +96,7 @@ export default function ResultPreview({ result, preset, originalSize }: Props) {
         data-testid="download-btn"
         className="w-full py-3 rounded-xl bg-yellow-400 text-neutral-900 font-bold text-center hover:bg-yellow-300 transition-colors"
       >
-        Download {result.sizeKB}KB JPEG
+        Download {result.sizeKB}KB {preset.format.toUpperCase()}
       </button>
 
       {/* File name */}
