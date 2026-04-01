@@ -43,6 +43,44 @@ const signatureResizerJsonLd = {
   browserRequirements: "Any modern browser",
 };
 
+const SIG_FAQ = [
+  {
+    question: "How do I resize my signature for an exam?",
+    answer: "Upload a photo of your signature, select your exam preset, and click Resize. FitPic auto-detects dark backgrounds and converts to clean black ink on white.",
+  },
+  {
+    question: "What if my signature has a dark background?",
+    answer: "FitPic automatically detects dark backgrounds and inverts them. Your signature will be converted to black ink on white paper — no manual editing needed.",
+  },
+  {
+    question: "What size should my signature be?",
+    answer: "Common exam requirements: 140x60px for SSC/IBPS/SBI, 150x60px for Railway. FitPic has exact presets for 100+ exams.",
+  },
+  {
+    question: "Can I use a phone photo of my signature?",
+    answer: "Yes! Take a photo of your signature on white paper with good lighting. FitPic will clean it up, remove the background, and resize to exact specs.",
+  },
+];
+
+const sigFaqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: SIG_FAQ.map((item) => ({
+    "@type": "Question",
+    name: item.question,
+    acceptedAnswer: { "@type": "Answer", text: item.answer },
+  })),
+};
+
+const sigBreadcrumbJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+    { "@type": "ListItem", position: 2, name: "Signature Resizer", item: `${SITE_URL}/signature-resizer` },
+  ],
+};
+
 export default function SignatureResizerPage() {
   return (
     <div className="space-y-6">
@@ -58,6 +96,27 @@ export default function SignatureResizerPage() {
       <TrustBadge />
 
       <SignatureResizerClient />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(sigFaqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(sigBreadcrumbJsonLd) }}
+      />
+
+      <div className="space-y-3">
+        <h2 className="text-lg font-bold text-neutral-300">Frequently Asked Questions</h2>
+        {SIG_FAQ.map((item, i) => (
+          <details key={i} className="bg-neutral-900 rounded-xl border border-neutral-800">
+            <summary className="px-4 py-3 cursor-pointer text-sm font-medium text-neutral-200 hover:text-yellow-400">
+              {item.question}
+            </summary>
+            <p className="px-4 pb-3 text-neutral-400 text-sm leading-relaxed">{item.answer}</p>
+          </details>
+        ))}
+      </div>
 
       {/* Popular Exams — server-rendered for SEO */}
       <div className="space-y-3">
