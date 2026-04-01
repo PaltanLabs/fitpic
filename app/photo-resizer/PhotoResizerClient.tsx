@@ -35,6 +35,33 @@ export default function PhotoResizerClient() {
   const [result, setResult] = useState<ProcessResult | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [customMode, setCustomMode] = useState(false);
+  const [customWidth, setCustomWidth] = useState(200);
+  const [customHeight, setCustomHeight] = useState(200);
+  const [customMaxKB, setCustomMaxKB] = useState(100);
+
+  const applyCustomPreset = useCallback(() => {
+    const custom: ExamPreset = {
+      id: "custom",
+      name: "Custom Size",
+      exam: "Custom",
+      type: "photo",
+      width: customWidth,
+      height: customHeight,
+      minKB: 1,
+      maxKB: customMaxKB,
+      bgColor: null,
+      format: "jpeg",
+      dpi: 96,
+      requiresDateStamp: false,
+      note: `${customWidth}x${customHeight}px, max ${customMaxKB}KB`,
+      officialUrl: "",
+      category: "Custom",
+      searchKeywords: [],
+    };
+    setResult(null);
+    setPreset(custom);
+  }, [customWidth, customHeight, customMaxKB]);
 
   const handleImageLoad = useCallback(
     (img: HTMLImageElement, f: File) => {
@@ -140,6 +167,7 @@ export default function PhotoResizerClient() {
         }}
         onSelect={(p) => {
           setResult(null);
+          setCustomMode(false);
           setPreset(p);
           trackPresetSelected({ tool: "photo_resizer", preset_id: p.id, exam_name: p.exam, preset_type: p.type });
           const next = getPhotoToolPresetState(p.requiresDateStamp);
@@ -153,6 +181,70 @@ export default function PhotoResizerClient() {
         }}
       />
 
+      {/* Custom size toggle */}
+      <div className="space-y-3">
+        <button
+          onClick={() => {
+            setCustomMode(!customMode);
+            if (!customMode) {
+              applyCustomPreset();
+            } else {
+              setPreset(null);
+              setResult(null);
+            }
+          }}
+          className={`w-full text-left p-3 rounded-xl border text-sm transition-colors ${
+            customMode
+              ? "border-yellow-400 bg-yellow-400/10 text-yellow-400"
+              : "border-neutral-800 bg-neutral-900 text-neutral-400 hover:border-neutral-600"
+          }`}
+        >
+          <span className="font-medium">{customMode ? "✓ " : ""}Custom Size</span>
+          <span className="text-neutral-500 text-xs ml-2">— enter your own dimensions, no exam needed</span>
+        </button>
+
+        {customMode && (
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="text-neutral-500 text-xs block mb-1">Width (px)</label>
+              <input
+                type="number"
+                value={customWidth}
+                onChange={(e) => { setCustomWidth(Number(e.target.value) || 1); }}
+                onBlur={applyCustomPreset}
+                min={1}
+                max={5000}
+                className="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-700 text-sm text-neutral-200 focus:border-yellow-400 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-neutral-500 text-xs block mb-1">Height (px)</label>
+              <input
+                type="number"
+                value={customHeight}
+                onChange={(e) => { setCustomHeight(Number(e.target.value) || 1); }}
+                onBlur={applyCustomPreset}
+                min={1}
+                max={5000}
+                className="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-700 text-sm text-neutral-200 focus:border-yellow-400 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-neutral-500 text-xs block mb-1">Max size (KB)</label>
+              <input
+                type="number"
+                value={customMaxKB}
+                onChange={(e) => { setCustomMaxKB(Number(e.target.value) || 1); }}
+                onBlur={applyCustomPreset}
+                min={1}
+                max={10000}
+                className="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-700 text-sm text-neutral-200 focus:border-yellow-400 focus:outline-none"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
       <AdSlot slot="photo-top" format="horizontal" />
 
       {/* Step 2: Upload */}
@@ -164,7 +256,7 @@ export default function PhotoResizerClient() {
 
       {image && !preset && !result && (
         <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-xl p-4 text-center space-y-2">
-          <p className="text-yellow-400 text-sm font-medium">Photo uploaded! Now select your exam above to resize.</p>
+          <p className="text-yellow-400 text-sm font-medium">Photo uploaded! Select an exam above or use Custom Size to resize.</p>
         </div>
       )}
 
