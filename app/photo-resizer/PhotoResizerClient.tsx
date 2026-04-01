@@ -139,7 +139,7 @@ export default function PhotoResizerClient() {
           setDateStamperKey((k) => k + 1);
         }}
         onSelect={(p) => {
-          clearUploadState();
+          setResult(null);
           setPreset(p);
           trackPresetSelected({ tool: "photo_resizer", preset_id: p.id, exam_name: p.exam, preset_type: p.type });
           const next = getPhotoToolPresetState(p.requiresDateStamp);
@@ -149,7 +149,6 @@ export default function PhotoResizerClient() {
           setWhiteBackgroundMode(next.whiteBackgroundMode);
           setWhiteBgError(next.whiteBgError);
           setWhiteBgDurationMs(next.whiteBgDurationMs);
-          setUploaderKey((k) => k + 1);
           setDateStamperKey((k) => k + 1);
         }}
       />
