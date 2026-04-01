@@ -10,7 +10,6 @@ import Tips from "@/components/Tips";
 import PhotoFramingControls from "@/components/PhotoFramingControls";
 import { type ExamPreset } from "@/lib/presets";
 import { processImage, type ProcessResult } from "@/lib/imageEngine";
-import { makeWhiteBackground } from "@/lib/whiteBackground";
 import { preparePhotoSourceImage } from "@/lib/photoSource";
 import {
   DEFAULT_CROP_BIAS_Y,
@@ -60,10 +59,15 @@ export default function PhotoResizerClient() {
     setWhiteBgError(null);
     setWhiteBgDurationMs(null);
     try {
+      let makeWhiteBackgroundFn: ((img: HTMLImageElement) => Promise<{ image: HTMLImageElement; durationMs: number }>) | undefined;
+      if (whiteBackgroundMode) {
+        const mod = await import("@/lib/whiteBackground");
+        makeWhiteBackgroundFn = mod.makeWhiteBackground;
+      }
       const prepared = await preparePhotoSourceImage({
         image,
         whiteBackgroundMode,
-        makeWhiteBackgroundFn: makeWhiteBackground,
+        makeWhiteBackgroundFn: makeWhiteBackgroundFn ?? (async () => { throw new Error("Not loaded"); }),
       });
       if (prepared.whiteBgError) {
         setWhiteBgError(prepared.whiteBgError);

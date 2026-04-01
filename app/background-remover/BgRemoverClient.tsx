@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useRef } from "react";
 import ImageUploader from "@/components/ImageUploader";
-import { makeWhiteBackground } from "@/lib/whiteBackground";
 import { PRESETS } from "@/lib/presets";
 import { processImage } from "@/lib/imageEngine";
 import { trackUpload, trackProcessComplete, trackDownload, trackProcessError } from "@/lib/analytics";
@@ -33,6 +32,7 @@ export default function BgRemoverClient() {
       trackUpload({ tool: "background_remover", file_type: "image", file_size_kb: 0, preset_id: selectedPreset || undefined });
 
       try {
+        const { makeWhiteBackground } = await import("@/lib/whiteBackground");
         const result = await makeWhiteBackground(img);
         let finalSrc = result.image.src;
 

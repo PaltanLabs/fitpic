@@ -8,7 +8,6 @@ import DateStamper from "@/components/DateStamper";
 import AdSlot from "@/components/AdSlot";
 import PhotoFramingControls from "@/components/PhotoFramingControls";
 import { processImage, type ProcessResult } from "@/lib/imageEngine";
-import { makeWhiteBackground } from "@/lib/whiteBackground";
 import { preparePhotoSourceImage } from "@/lib/photoSource";
 import {
   DEFAULT_CROP_BIAS_Y,
@@ -62,11 +61,18 @@ export default function ExamToolClient({ presetId }: Props) {
             whiteBgError: null,
             whiteBgDurationMs: null,
           }
-        : await preparePhotoSourceImage({
-            image,
-            whiteBackgroundMode,
-            makeWhiteBackgroundFn: makeWhiteBackground,
-          });
+        : await (async () => {
+            let fn: ((img: HTMLImageElement) => Promise<{ image: HTMLImageElement; durationMs: number }>) | undefined;
+            if (whiteBackgroundMode) {
+              const mod = await import("@/lib/whiteBackground");
+              fn = mod.makeWhiteBackground;
+            }
+            return preparePhotoSourceImage({
+              image,
+              whiteBackgroundMode,
+              makeWhiteBackgroundFn: fn ?? (async () => { throw new Error("Not loaded"); }),
+            });
+          })();
 
       if (prepared.whiteBgError) {
         setWhiteBgError(prepared.whiteBgError);
