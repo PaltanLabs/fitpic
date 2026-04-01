@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import { PRESETS, getPresetSlug, CATEGORIES } from "@/lib/presets";
 import AdSlot from "@/components/AdSlot";
+import TrustBadge from "@/components/TrustBadge";
 
 const FAQ_ITEMS = [
   {
@@ -74,6 +75,21 @@ export default function HomePage() {
         <div className="flex items-center justify-center gap-2 text-emerald-400 text-sm">
           <span>🔒</span>
           <span>100% browser-based — we never see your photos</span>
+        </div>
+        <TrustBadge />
+        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+          <a
+            href="/photo-resizer"
+            className="px-6 py-3 rounded-xl bg-yellow-400 text-neutral-900 font-bold text-center hover:bg-yellow-300 transition-colors"
+          >
+            Resize Photo Now
+          </a>
+          <a
+            href="/signature-resizer"
+            className="px-6 py-3 rounded-xl bg-neutral-800 text-neutral-200 font-bold text-center hover:bg-neutral-700 transition-colors border border-neutral-700"
+          >
+            Resize Signature
+          </a>
         </div>
       </div>
 
@@ -158,9 +174,11 @@ export default function HomePage() {
           Supported Exam Formats
         </h2>
         {examsByCategory.map(({ category, presets }) => (
-          <div key={category} className="space-y-2">
-            <h3 className="text-neutral-400 text-sm font-medium">{category}</h3>
-            <div className="overflow-x-auto">
+          <details key={category} className="group">
+            <summary className="text-neutral-400 text-sm font-medium cursor-pointer hover:text-neutral-200 py-1">
+              {category} ({presets.length} presets)
+            </summary>
+            <div className="overflow-x-auto mt-2">
               <table className="w-full text-xs text-left">
                 <thead>
                   <tr className="text-neutral-500 border-b border-neutral-800">
@@ -199,7 +217,7 @@ export default function HomePage() {
                 </tbody>
               </table>
             </div>
-          </div>
+          </details>
         ))}
       </div>
 
