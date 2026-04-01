@@ -157,24 +157,26 @@ export default function PhotoResizerClient() {
       <AdSlot slot="photo-top" format="horizontal" />
 
       {/* Step 2: Upload */}
-      {preset && (
-        <>
-          <ImageUploader
-            key={`${preset.id}-${uploaderKey}`}
-            onImageLoad={handleImageLoad}
-            label="Upload Photo"
-          />
+      <ImageUploader
+        key={`photo-${preset?.id ?? "none"}-${uploaderKey}`}
+        onImageLoad={handleImageLoad}
+        label="Upload Photo"
+      />
 
-          {/* Date stamp */}
-          {preset.requiresDateStamp && (
-            <DateStamper
-              key={`${preset.id}-${dateStamperKey}`}
-              enabled={dateStampEnabled}
-              onToggle={setDateStampEnabled}
-              onStampChange={setDateStamp}
-            />
-          )}
-        </>
+      {image && !preset && !result && (
+        <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-xl p-4 text-center space-y-2">
+          <p className="text-yellow-400 text-sm font-medium">Photo uploaded! Now select your exam above to resize.</p>
+        </div>
+      )}
+
+      {/* Date stamp */}
+      {preset && preset.requiresDateStamp && (
+        <DateStamper
+          key={`${preset.id}-${dateStamperKey}`}
+          enabled={dateStampEnabled}
+          onToggle={setDateStampEnabled}
+          onStampChange={setDateStamp}
+        />
       )}
 
       <AdSlot slot="photo-mid" format="rectangle" className="my-4" />
