@@ -1,5 +1,3 @@
-import posthog from "posthog-js";
-
 /** Centralized PostHog event tracking for FitPic tool usage funnel. */
 
 type ToolName =
@@ -39,16 +37,24 @@ interface DownloadProps {
   file_size_kb?: number;
 }
 
+function capture(event: string, props: Record<string, unknown>) {
+  import("posthog-js").then((mod) => {
+    if (mod.default.__loaded) {
+      mod.default.capture(event, props);
+    }
+  }).catch(() => {});
+}
+
 export function trackUpload(props: UploadProps) {
-  posthog.capture("file_uploaded", props);
+  capture("file_uploaded", props as unknown as Record<string, unknown>);
 }
 
 export function trackProcessComplete(props: ProcessProps) {
-  posthog.capture("process_complete", props);
+  capture("process_complete", props as unknown as Record<string, unknown>);
 }
 
 export function trackDownload(props: DownloadProps) {
-  posthog.capture("file_downloaded", props);
+  capture("file_downloaded", props as unknown as Record<string, unknown>);
 }
 
 export function trackPresetSelected(props: {
@@ -57,7 +63,7 @@ export function trackPresetSelected(props: {
   exam_name: string;
   preset_type: string;
 }) {
-  posthog.capture("preset_selected", props);
+  capture("preset_selected", props as unknown as Record<string, unknown>);
 }
 
 export function trackProcessError(props: {
@@ -65,5 +71,5 @@ export function trackProcessError(props: {
   error_message: string;
   preset_id?: string;
 }) {
-  posthog.capture("process_error", props);
+  capture("process_error", props as unknown as Record<string, unknown>);
 }

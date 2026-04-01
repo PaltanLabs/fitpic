@@ -1,13 +1,12 @@
 "use client";
 
-import posthog from "posthog-js";
 import { PostHogProvider as PHProvider } from "posthog-js/react";
-import { useEffect, Component, type ReactNode, type ErrorInfo } from "react";
+import { useEffect, useState, Component, type ReactNode, type ErrorInfo } from "react";
+import type { PostHog } from "posthog-js";
 
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY || "";
 const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "/ingest";
 
-// Catches React render errors
 class ErrorBoundary extends Component<
   { children: ReactNode },
   { hasError: boolean }
@@ -22,11 +21,13 @@ class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    posthog.capture("$exception", {
-      $exception_message: error.message,
-      $exception_stack: error.stack,
-      $exception_component: info.componentStack,
-      $exception_type: "react_error_boundary",
+    import("posthog-js").then((mod) => {
+      mod.default.capture("$exception", {
+        $exception_message: error.message,
+        $exception_stack: error.stack,
+        $exception_component: info.componentStack,
+        $exception_type: "react_error_boundary",
+      });
     });
   }
 
@@ -54,33 +55,41 @@ class ErrorBoundary extends Component<
 }
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
+  const [client, setClient] = useState<PostHog | null>(null);
+
   useEffect(() => {
     if (!POSTHOG_KEY) return;
-    posthog.init(POSTHOG_KEY, {
-      api_host: POSTHOG_HOST,
-      person_profiles: "identified_only",
-      capture_pageview: true,
-      capture_pageleave: true,
-      capture_performance: true,
-      autocapture: true,
+    import("posthog-js").then((mod) => {
+      const posthog = mod.default;
+      posthog.init(POSTHOG_KEY, {
+        api_host: POSTHOG_HOST,
+        person_profiles: "identified_only",
+        capture_pageview: true,
+        capture_pageleave: true,
+        capture_performance: true,
+        autocapture: true,
+      });
+      setClient(posthog);
     });
 
-    // Catches unhandled JS errors (outside React)
     const onError = (event: ErrorEvent) => {
-      posthog.capture("$exception", {
-        $exception_message: event.message,
-        $exception_stack: event.error?.stack,
-        $exception_source: `${event.filename}:${event.lineno}:${event.colno}`,
-        $exception_type: "window_onerror",
+      import("posthog-js").then((mod) => {
+        mod.default.capture("$exception", {
+          $exception_message: event.message,
+          $exception_stack: event.error?.stack,
+          $exception_source: `${event.filename}:${event.lineno}:${event.colno}`,
+          $exception_type: "window_onerror",
+        });
       });
     };
 
-    // Catches unhandled promise rejections
     const onRejection = (event: PromiseRejectionEvent) => {
-      posthog.capture("$exception", {
-        $exception_message: String(event.reason),
-        $exception_stack: event.reason?.stack,
-        $exception_type: "unhandled_rejection",
+      import("posthog-js").then((mod) => {
+        mod.default.capture("$exception", {
+          $exception_message: String(event.reason),
+          $exception_stack: event.reason?.stack,
+          $exception_type: "unhandled_rejection",
+        });
       });
     };
 
@@ -93,11 +102,13 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  if (!POSTHOG_KEY) return <>{children}</>;
+  if (!POSTHOG_KEY) return <ErrorBoundary>{children}</ErrorBoundary>;
 
-  return (
-    <PHProvider client={posthog}>
+  return client ? (
+    <PHProvider client={client}>
       <ErrorBoundary>{children}</ErrorBoundary>
     </PHProvider>
+  ) : (
+    <ErrorBoundary>{children}</ErrorBoundary>
   );
 }
