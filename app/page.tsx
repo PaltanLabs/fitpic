@@ -33,25 +33,25 @@ const FAQ_ITEMS = [
 ];
 
 export const metadata: Metadata = {
-  title: `Free Photo & Signature Resizer for Govt Exams`,
+  title: `Free Photo Resizer & Compressor — Resize to Exact KB & Pixels Online`,
   description:
-    "Free online photo and signature resizer for Indian government exams. SSC, UPSC, IBPS, Railway, NEET, JEE, PAN, Aadhaar, Passport. Resize to exact KB and pixels. 100% browser-based, private, no signup.",
+    "Free online photo resizer and compressor. Resize photos to exact KB and pixel dimensions for government exams (SSC, UPSC, IBPS, Railway, NEET), passport, PAN card, Aadhaar. 100% browser-based, no signup.",
   keywords:
-    "photo resizer, signature resizer, exam photo resize, compress photo to kb, govt exam photo size",
+    "photo resizer, image resizer, compress photo to kb, resize photo online, signature resizer, passport photo resizer, exam photo size, photo compressor",
   alternates: { canonical: "/" },
   openGraph: {
-    title: `${SITE_NAME} — Free Photo & Signature Resizer for Govt Exams`,
+    title: `${SITE_NAME} — Free Photo Resizer & Compressor`,
     description:
-      "Free online photo and signature resizer for Indian government exams. SSC, UPSC, IBPS, Railway, NEET, JEE, PAN, Aadhaar, Passport.",
+      "Resize photos to exact KB and pixel dimensions. Free, browser-based, no signup. 150+ exam presets.",
     type: "website",
     siteName: SITE_NAME,
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} — Free Photo & Signature Resizer for Govt Exams`,
+    title: `${SITE_NAME} — Free Photo Resizer & Compressor`,
     description:
-      "Free online photo and signature resizer for Indian government exams.",
+      "Resize photos to exact KB and pixel dimensions. Free, browser-based, no signup. 150+ exam presets.",
   },
 };
 
@@ -270,6 +270,43 @@ export default function HomePage() {
               logo: `${SITE_URL}/icon.png`,
               description:
                 "Free online photo and signature resizer for Indian government exams. 100% browser-based, private, no signup required.",
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "HowTo",
+              name: "How to Resize a Photo for Government Exams",
+              description: "Resize your photo to exact exam specifications in 3 simple steps.",
+              step: [
+                {
+                  "@type": "HowToStep",
+                  position: 1,
+                  name: "Choose Your Exam",
+                  text: "Select from 150+ exam presets (SSC, UPSC, IBPS, Railway, NEET, PAN, Aadhaar, Passport) or enter custom dimensions.",
+                },
+                {
+                  "@type": "HowToStep",
+                  position: 2,
+                  name: "Upload Your Photo",
+                  text: "Upload a JPG, PNG, or WebP photo. Works with phone camera photos too.",
+                },
+                {
+                  "@type": "HowToStep",
+                  position: 3,
+                  name: "Download the Resized File",
+                  text: "Your photo is automatically resized to exact pixel dimensions and compressed to the required KB range. Download and upload to your exam form.",
+                },
+              ],
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: SITE_NAME,
+              url: SITE_URL,
+              potentialAction: {
+                "@type": "SearchAction",
+                target: `${SITE_URL}/photo-resizer`,
+                "query-input": "required name=search_term_string",
+              },
             },
           ]),
         }}
