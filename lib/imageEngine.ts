@@ -11,7 +11,11 @@
 
 import Pica from "pica";
 
-const pica = new Pica();
+let _pica: Pica | null = null;
+function getPica(): Pica {
+  if (!_pica) _pica = new Pica();
+  return _pica;
+}
 
 // ===== Engine constants =====
 const SIGNATURE_INK_THRESHOLD = 115;
@@ -238,7 +242,7 @@ async function picaResizeMultiPass(
     const mid1H = targetH * 4;
     const mid1Canvas = makeCanvas(mid1W, mid1H);
     try {
-      await pica.resize(src, mid1Canvas, {
+      await getPica().resize(src, mid1Canvas, {
         unsharpAmount: Math.round(unsharpAmount * 0.5),
         unsharpRadius: unsharpRadius * 0.5,
         unsharpThreshold,
@@ -252,7 +256,7 @@ async function picaResizeMultiPass(
     const mid2H = targetH * 2;
     const mid2Canvas = makeCanvas(mid2W, mid2H);
     try {
-      await pica.resize(mid1Canvas, mid2Canvas, {
+      await getPica().resize(mid1Canvas, mid2Canvas, {
         unsharpAmount: Math.round(unsharpAmount * 0.75),
         unsharpRadius,
         unsharpThreshold,
@@ -264,7 +268,7 @@ async function picaResizeMultiPass(
 
     const destCanvas = makeCanvas(targetW, targetH);
     try {
-      await pica.resize(mid2Canvas, destCanvas, {
+      await getPica().resize(mid2Canvas, destCanvas, {
         unsharpAmount,
         unsharpRadius,
         unsharpThreshold,
@@ -282,7 +286,7 @@ async function picaResizeMultiPass(
     const midH = targetH * 2;
     const midCanvas = makeCanvas(midW, midH);
     try {
-      await pica.resize(src, midCanvas, {
+      await getPica().resize(src, midCanvas, {
         unsharpAmount: Math.round(unsharpAmount * 0.75),
         unsharpRadius,
         unsharpThreshold,
@@ -294,7 +298,7 @@ async function picaResizeMultiPass(
 
     const destCanvas = makeCanvas(targetW, targetH);
     try {
-      await pica.resize(midCanvas, destCanvas, {
+      await getPica().resize(midCanvas, destCanvas, {
         unsharpAmount,
         unsharpRadius,
         unsharpThreshold,
@@ -309,7 +313,7 @@ async function picaResizeMultiPass(
   // Single pass
   const destCanvas = makeCanvas(targetW, targetH);
   try {
-    await pica.resize(src, destCanvas, {
+    await getPica().resize(src, destCanvas, {
       unsharpAmount,
       unsharpRadius,
       unsharpThreshold,
@@ -415,7 +419,7 @@ export async function processImage(
     // Resize to fitted dimensions
     const fitCanvas = makeCanvas(fitW, fitH);
     try {
-      await pica.resize(srcCanvas, fitCanvas, {
+      await getPica().resize(srcCanvas, fitCanvas, {
         unsharpAmount: SIGNATURE_UNSHARP.amount,
         unsharpRadius: SIGNATURE_UNSHARP.radius,
         unsharpThreshold: SIGNATURE_UNSHARP.threshold,
@@ -483,7 +487,7 @@ export async function processImage(
 
   if (format === "png") {
     try {
-      bestBlob = await pica.toBlob(finalCanvas, "image/png", 0);
+      bestBlob = await getPica().toBlob(finalCanvas, "image/png", 0);
     } catch {
       throw new ProcessingError("Failed to compress image. Try a smaller source file.");
     }
@@ -505,7 +509,7 @@ export async function processImage(
       const mid = (lo + hi) / 2;
       let blob: Blob;
       try {
-        blob = await pica.toBlob(finalCanvas, "image/jpeg", mid);
+        blob = await getPica().toBlob(finalCanvas, "image/jpeg", mid);
       } catch {
         throw new ProcessingError("Failed to compress image. Try a smaller source file.");
       }
@@ -525,7 +529,7 @@ export async function processImage(
 
     if (!bestBlob || formatChanged) {
       try {
-        bestBlob = await pica.toBlob(finalCanvas, "image/jpeg", JPEG_MIN_QUALITY);
+        bestBlob = await getPica().toBlob(finalCanvas, "image/jpeg", JPEG_MIN_QUALITY);
       } catch {
         throw new ProcessingError("Failed to compress image. Try a smaller source file.");
       }
