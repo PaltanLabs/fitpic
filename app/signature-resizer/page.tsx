@@ -16,6 +16,7 @@ export const metadata: Metadata = {
       "Free online signature resizer for SSC, UPSC, IBPS, Railway, PAN Card. Auto-converts dark backgrounds to white, black ink optimized.",
     type: "website",
     siteName: SITE_NAME,
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",

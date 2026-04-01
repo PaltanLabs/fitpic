@@ -24,6 +24,7 @@ export function generatePresetMetadata(preset: ExamPreset) {
       description,
       type: "website" as const,
       siteName: SITE_NAME,
+      images: [{ url: "/og-image.png", width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image" as const,
