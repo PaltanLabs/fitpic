@@ -8,6 +8,7 @@ import DateStamper from "@/components/DateStamper";
 import AdSlot from "@/components/AdSlot";
 import Tips from "@/components/Tips";
 import PhotoFramingControls from "@/components/PhotoFramingControls";
+import CropPreview from "@/components/CropPreview";
 import { type ExamPreset } from "@/lib/presets";
 import { processImage, type ProcessResult } from "@/lib/imageEngine";
 import { preparePhotoSourceImage } from "@/lib/photoSource";
@@ -275,6 +276,12 @@ export default function PhotoResizerClient() {
       {/* Step 3: Resize */}
       {preset && image && !result && (
         <div className="space-y-3">
+          <CropPreview
+            image={image}
+            targetWidth={preset.width}
+            targetHeight={preset.height}
+            cropBiasY={cropBiasY}
+          />
           <PhotoFramingControls
             cropBiasY={cropBiasY}
             onCropBiasYChange={setCropBiasY}

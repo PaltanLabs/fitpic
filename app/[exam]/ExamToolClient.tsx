@@ -7,6 +7,7 @@ import ResultPreview from "@/components/ResultPreview";
 import DateStamper from "@/components/DateStamper";
 import AdSlot from "@/components/AdSlot";
 import PhotoFramingControls from "@/components/PhotoFramingControls";
+import CropPreview from "@/components/CropPreview";
 import { processImage, type ProcessResult } from "@/lib/imageEngine";
 import { preparePhotoSourceImage } from "@/lib/photoSource";
 import {
@@ -139,6 +140,12 @@ export default function ExamToolClient({ presetId }: Props) {
         <div className="space-y-3">
           {!isSignature && (
             <>
+              <CropPreview
+                image={image}
+                targetWidth={preset.width}
+                targetHeight={preset.height}
+                cropBiasY={cropBiasY}
+              />
               <PhotoFramingControls
                 cropBiasY={cropBiasY}
                 onCropBiasYChange={setCropBiasY}

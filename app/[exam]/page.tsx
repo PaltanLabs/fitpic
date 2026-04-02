@@ -9,6 +9,7 @@ import {
 } from "@/components/SEOHead";
 import type { Metadata } from "next";
 import ExamToolClient from "./ExamToolClient";
+import StickyExamCTA from "@/components/StickyExamCTA";
 import { EXAM_CONTENT } from "@/lib/exam-content";
 import { HINDI_EXAM_CONTENT } from "@/lib/hindi-content";
 
@@ -69,6 +70,7 @@ export default function ExamPage({ params }: { params: { exam: string } }) {
   const breadcrumbJsonLd = generateBreadcrumbJsonLd(preset, slug);
   const parentPath = preset.type === "signature" ? "/signature-resizer" : "/photo-resizer";
   const parentName = preset.type === "signature" ? "Signature Resizer" : "Photo Resizer";
+  const hasHindi = HINDI_EXAM_CONTENT.some((h) => h.examSlug === slug);
 
   return (
     <div className="space-y-8">
@@ -99,6 +101,15 @@ export default function ExamPage({ params }: { params: { exam: string } }) {
         <span className="text-neutral-400">{preset.exam} {typeLabel} Resizer</span>
       </nav>
 
+      {/* Hindi version link */}
+      {hasHindi && (
+        <div className="flex justify-end">
+          <a href={`/hi/${slug}`} className="text-yellow-400 hover:underline text-xs">
+            हिंदी में देखें →
+          </a>
+        </div>
+      )}
+
       {/* SEO heading */}
       <div className="space-y-3">
         <h1 className="text-2xl font-bold">
@@ -115,7 +126,11 @@ export default function ExamPage({ params }: { params: { exam: string } }) {
       </div>
 
       {/* The actual tool */}
-      <ExamToolClient presetId={preset.id} />
+      <div id="exam-tool">
+        <ExamToolClient presetId={preset.id} />
+      </div>
+
+      <StickyExamCTA examName={preset.exam} targetId="exam-tool" />
 
       {/* Exam-specific content */}
       {EXAM_CONTENT[preset.exam] && (

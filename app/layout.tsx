@@ -82,34 +82,35 @@ export default function RootLayout({
                 <div className="space-y-3">
                   <h4 className="text-neutral-200 font-semibold text-sm">Tools</h4>
                   <div className="space-y-2">
-                    <Link href="/photo-resizer" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Photo Resizer</Link>
-                    <Link href="/signature-resizer" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Signature Resizer</Link>
-                    <Link href="/photo-signature-joiner" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Photo + Signature Joiner</Link>
-                    <Link href="/name-date-stamp" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Name & Date Stamp</Link>
-                    <Link href="/photo-validator" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Photo Validator</Link>
+                    <Link href="/photo-resizer" className="block text-neutral-400 hover:text-neutral-200 transition-colors">Photo Resizer</Link>
+                    <Link href="/signature-resizer" className="block text-neutral-400 hover:text-neutral-200 transition-colors">Signature Resizer</Link>
+                    <Link href="/photo-signature-joiner" className="block text-neutral-400 hover:text-neutral-200 transition-colors">Photo + Signature Joiner</Link>
+                    <Link href="/name-date-stamp" className="block text-neutral-400 hover:text-neutral-200 transition-colors">Name & Date Stamp</Link>
+                    <Link href="/photo-validator" className="block text-neutral-400 hover:text-neutral-200 transition-colors">Photo Validator</Link>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <h4 className="text-neutral-200 font-semibold text-sm">Exams</h4>
                   <div className="space-y-2">
-                    <Link href="/category/ssc" className="block text-neutral-500 hover:text-neutral-300 transition-colors">SSC</Link>
-                    <Link href="/category/upsc" className="block text-neutral-500 hover:text-neutral-300 transition-colors">UPSC</Link>
-                    <Link href="/category/banking" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Banking</Link>
-                    <Link href="/category/state-psc" className="block text-neutral-500 hover:text-neutral-300 transition-colors">State PSC</Link>
-                    <Link href="/category/police" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Police</Link>
+                    <Link href="/category/ssc" className="block text-neutral-400 hover:text-neutral-200 transition-colors">SSC</Link>
+                    <Link href="/category/upsc" className="block text-neutral-400 hover:text-neutral-200 transition-colors">UPSC</Link>
+                    <Link href="/category/banking" className="block text-neutral-400 hover:text-neutral-200 transition-colors">Banking</Link>
+                    <Link href="/category/state-psc" className="block text-neutral-400 hover:text-neutral-200 transition-colors">State PSC</Link>
+                    <Link href="/category/police" className="block text-neutral-400 hover:text-neutral-200 transition-colors">Police</Link>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <h4 className="text-neutral-200 font-semibold text-sm">Resources</h4>
                   <div className="space-y-2">
-                    <Link href="/blog" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Blog</Link>
+                    <Link href="/blog" className="block text-neutral-400 hover:text-neutral-200 transition-colors">Blog</Link>
+                    <Link href="/hi/ssc-cgl-photo-resizer" className="block text-neutral-400 hover:text-neutral-200 transition-colors">हिंदी (Hindi)</Link>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <h4 className="text-neutral-200 font-semibold text-sm">Company</h4>
                   <div className="space-y-2">
-                    <Link href="/about" className="block text-neutral-500 hover:text-neutral-300 transition-colors">About</Link>
-                    <Link href="/privacy-policy" className="block text-neutral-500 hover:text-neutral-300 transition-colors">Privacy Policy</Link>
+                    <Link href="/about" className="block text-neutral-400 hover:text-neutral-200 transition-colors">About</Link>
+                    <Link href="/privacy-policy" className="block text-neutral-400 hover:text-neutral-200 transition-colors">Privacy Policy</Link>
                   </div>
                 </div>
               </div>

@@ -71,6 +71,13 @@ function MenuOverlay({ onClose }: { onClose: () => void }) {
             Blog
           </Link>
           <Link
+            href="/hi/ssc-cgl-photo-resizer"
+            onClick={onClose}
+            className="block px-3 py-2.5 rounded-xl text-sm text-neutral-300 hover:bg-neutral-800/50 hover:text-yellow-400 transition-colors"
+          >
+            हिंदी (Hindi)
+          </Link>
+          <Link
             href="/about"
             onClick={onClose}
             className="block px-3 py-2.5 rounded-xl text-sm text-neutral-300 hover:bg-neutral-800/50 hover:text-yellow-400 transition-colors"
