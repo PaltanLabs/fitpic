@@ -35,10 +35,10 @@ const JPEG_MAX_QUALITY = 0.99;
 const JPEG_CONVERGENCE_DELTA = 0.005;
 const SIGNATURE_UNSHARP = { amount: 200, radius: 0.8, threshold: 1 };
 const UNSHARP_CONFIGS = [
-  { maxRatio: 1.5, amount: 80, radius: 0.4 },
-  { maxRatio: 3, amount: 160, radius: 0.8 },
-  { maxRatio: 6, amount: 260, radius: 0.9 },
-  { maxRatio: Infinity, amount: 320, radius: 1.0 },
+  { maxRatio: 1.5, amount: 40, radius: 0.3 },
+  { maxRatio: 3, amount: 60, radius: 0.4 },
+  { maxRatio: 6, amount: 80, radius: 0.5 },
+  { maxRatio: Infinity, amount: 100, radius: 0.6 },
 ] as const;
 
 export class ProcessingError extends Error {
@@ -238,14 +238,12 @@ async function picaResizeMultiPass(
 
   if (ratio > THREE_PASS_RATIO) {
     // Three-pass: source → 4x target → 2x target → target
+    // Only sharpen on the FINAL pass to avoid compounding artifacts
     const mid1W = targetW * 4;
     const mid1H = targetH * 4;
     const mid1Canvas = makeCanvas(mid1W, mid1H);
     try {
       await getPica().resize(src, mid1Canvas, {
-        unsharpAmount: Math.round(unsharpAmount * 0.5),
-        unsharpRadius: unsharpRadius * 0.5,
-        unsharpThreshold,
         alpha: false,
       });
     } catch {
@@ -257,9 +255,6 @@ async function picaResizeMultiPass(
     const mid2Canvas = makeCanvas(mid2W, mid2H);
     try {
       await getPica().resize(mid1Canvas, mid2Canvas, {
-        unsharpAmount: Math.round(unsharpAmount * 0.75),
-        unsharpRadius,
-        unsharpThreshold,
         alpha: false,
       });
     } catch {
@@ -282,14 +277,12 @@ async function picaResizeMultiPass(
 
   if (ratio > MULTI_PASS_RATIO) {
     // Two-pass: source → 2x target → target
+    // Only sharpen on the FINAL pass
     const midW = targetW * 2;
     const midH = targetH * 2;
     const midCanvas = makeCanvas(midW, midH);
     try {
       await getPica().resize(src, midCanvas, {
-        unsharpAmount: Math.round(unsharpAmount * 0.75),
-        unsharpRadius,
-        unsharpThreshold,
         alpha: false,
       });
     } catch {
