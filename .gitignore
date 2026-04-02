@@ -8,3 +8,4 @@ test-output/
 next-env.d.ts
 .vercel
 .DS_Store
+.gstack/

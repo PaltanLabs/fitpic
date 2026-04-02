@@ -5,6 +5,7 @@ import Script from "next/script";
 import Link from "next/link";
 import { Inter } from "next/font/google";
 import { PostHogProvider } from "@/components/PostHogProvider";
+import MobileNav from "@/components/MobileNav";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -60,14 +61,15 @@ export default function RootLayout({
               <Link href="/" className="logo-shimmer font-bold text-lg relative">
                 <span className="gradient-text">{SITE_NAME}</span>
               </Link>
-              <nav className="flex gap-5 text-sm text-neutral-400">
+              <nav className="hidden sm:flex gap-5 text-sm text-neutral-400">
                 <Link href="/photo-resizer" className="nav-link">Photo</Link>
                 <Link href="/signature-resizer" className="nav-link">Signature</Link>
-                <Link href="/category/ssc" className="nav-link hidden sm:inline">SSC</Link>
-                <Link href="/category/banking" className="nav-link hidden sm:inline">Banking</Link>
-                <Link href="/category/state-psc" className="nav-link hidden sm:inline">State PSC</Link>
+                <Link href="/category/ssc" className="nav-link">SSC</Link>
+                <Link href="/category/banking" className="nav-link">Banking</Link>
+                <Link href="/category/state-psc" className="nav-link">State PSC</Link>
                 <Link href="/blog" className="nav-link">Blog</Link>
               </nav>
+              <MobileNav />
             </div>
           </header>
 

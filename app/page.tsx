@@ -155,10 +155,27 @@ export default function HomePage() {
           </a>
 
           <a
-            href="/photo-signature-joiner"
+            href="/background-remover"
             className="glass-card rounded-2xl p-6 block group"
             data-animate="fade-up"
             data-delay="3"
+          >
+            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3 group-hover:bg-emerald-500/20 transition-colors">
+              <svg className="w-5 h-5 text-emerald-400 feature-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-neutral-100">Background Remover</h3>
+            <p className="text-neutral-400 text-sm mt-1.5 leading-relaxed">
+              Remove photo background with AI. Get a clean white background for exam forms.
+            </p>
+          </a>
+
+          <a
+            href="/photo-signature-joiner"
+            className="glass-card rounded-2xl p-6 block group"
+            data-animate="fade-up"
+            data-delay="1"
           >
             <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center mb-3 group-hover:bg-amber-500/20 transition-colors">
               <svg className="w-5 h-5 text-amber-400 feature-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -168,6 +185,74 @@ export default function HomePage() {
             <h3 className="text-lg font-bold text-neutral-100">Photo + Signature Joiner</h3>
             <p className="text-neutral-400 text-sm mt-1.5 leading-relaxed">
               Combine photo and signature into a single image for IBPS/SSC/RRB uploads.
+            </p>
+          </a>
+
+          <a
+            href="/name-date-stamp"
+            className="glass-card rounded-2xl p-6 block group"
+            data-animate="fade-up"
+            data-delay="2"
+          >
+            <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center mb-3 group-hover:bg-cyan-500/20 transition-colors">
+              <svg className="w-5 h-5 text-cyan-400 feature-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-neutral-100">Name & Date Stamp</h3>
+            <p className="text-neutral-400 text-sm mt-1.5 leading-relaxed">
+              Add name and date text to your photo for SSC, IBPS, and banking exam uploads.
+            </p>
+          </a>
+
+          <a
+            href="/photo-validator"
+            className="glass-card rounded-2xl p-6 block group"
+            data-animate="fade-up"
+            data-delay="3"
+          >
+            <div className="w-10 h-10 rounded-lg bg-rose-500/10 flex items-center justify-center mb-3 group-hover:bg-rose-500/20 transition-colors">
+              <svg className="w-5 h-5 text-rose-400 feature-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-neutral-100">Photo Validator</h3>
+            <p className="text-neutral-400 text-sm mt-1.5 leading-relaxed">
+              Check if your photo meets exam requirements before uploading. Validates size, dimensions, and format.
+            </p>
+          </a>
+
+          <a
+            href="/pdf-compressor"
+            className="glass-card rounded-2xl p-6 block group"
+            data-animate="fade-up"
+            data-delay="1"
+          >
+            <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center mb-3 group-hover:bg-orange-500/20 transition-colors">
+              <svg className="w-5 h-5 text-orange-400 feature-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-neutral-100">PDF Compressor</h3>
+            <p className="text-neutral-400 text-sm mt-1.5 leading-relaxed">
+              Compress PDFs to exact size limits for government exam form uploads.
+            </p>
+          </a>
+
+          <a
+            href="/application-set"
+            className="glass-card rounded-2xl p-6 block group"
+            data-animate="fade-up"
+            data-delay="2"
+          >
+            <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center mb-3 group-hover:bg-indigo-500/20 transition-colors">
+              <svg className="w-5 h-5 text-indigo-400 feature-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-neutral-100">Application Set</h3>
+            <p className="text-neutral-400 text-sm mt-1.5 leading-relaxed">
+              Get all documents ready for your exam in one go. Photo, signature, and more in a single ZIP.
             </p>
           </a>
         </div>

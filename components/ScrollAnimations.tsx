@@ -9,7 +9,7 @@ export default function ScrollAnimations() {
     // Mark elements already in viewport as visible BEFORE enabling animations
     elements.forEach((el) => {
       const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight + 50) {
+      if (rect.top < window.innerHeight + 100) {
         el.classList.add("visible");
       }
     });
@@ -27,8 +27,8 @@ export default function ScrollAnimations() {
         });
       },
       {
-        threshold: 0.1,
-        rootMargin: "0px 0px -40px 0px",
+        threshold: 0.05,
+        rootMargin: "50px 0px 0px 0px",
       }
     );
 
@@ -38,7 +38,17 @@ export default function ScrollAnimations() {
       }
     });
 
-    return () => observer.disconnect();
+    // Safety net: if any elements are still hidden after 1.5s, force them visible
+    const fallback = setTimeout(() => {
+      document.querySelectorAll("[data-animate]:not(.visible)").forEach((el) => {
+        el.classList.add("visible");
+      });
+    }, 1500);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(fallback);
+    };
   }, []);
 
   return null;
