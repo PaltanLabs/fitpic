@@ -444,9 +444,10 @@ export async function processImage(
     const downscaleRatio = Math.max(srcW / targetWidth, srcH / targetHeight);
     isUpscaled = downscaleRatio < 1;
 
-    // For tiny targets (< 200px), skip sharpening entirely — Lanczos3 is clean
-    // enough and any unsharp mask just adds noise at this scale.
-    const tinyTarget = targetWidth < 200 && targetHeight < 200;
+    // For small targets (≤ 600px), skip sharpening — Lanczos3 is clean enough
+    // and unsharp mask just adds noise/halos at passport-photo scale.
+    // All exam presets are ≤ 531px. Sharpening only helps for large outputs.
+    const tinyTarget = targetWidth <= 600 && targetHeight <= 600;
     const config = UNSHARP_CONFIGS.find((c) => downscaleRatio <= c.maxRatio)!;
     let unsharpAmount = tinyTarget ? 0 : config.amount;
     let unsharpRadius = tinyTarget ? 0 : config.radius;
