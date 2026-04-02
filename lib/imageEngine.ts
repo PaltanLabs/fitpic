@@ -444,12 +444,13 @@ export async function processImage(
     const downscaleRatio = Math.max(srcW / targetWidth, srcH / targetHeight);
     isUpscaled = downscaleRatio < 1;
 
-    // Heavier downscale = more aggressive sharpening.
-    // Tuned for tiny exam targets (e.g. 100x120) to preserve edge clarity.
+    // For tiny targets (< 200px), skip sharpening entirely — Lanczos3 is clean
+    // enough and any unsharp mask just adds noise at this scale.
+    const tinyTarget = targetWidth < 200 && targetHeight < 200;
     const config = UNSHARP_CONFIGS.find((c) => downscaleRatio <= c.maxRatio)!;
-    let unsharpAmount = config.amount;
-    let unsharpRadius = config.radius;
-    const unsharpThreshold = Math.max(1, Math.min(3, Math.round(downscaleRatio / 3)));
+    let unsharpAmount = tinyTarget ? 0 : config.amount;
+    let unsharpRadius = tinyTarget ? 0 : config.radius;
+    const unsharpThreshold = tinyTarget ? 0 : Math.max(1, Math.min(3, Math.round(downscaleRatio / 3)));
 
     destCanvas = await picaResizeMultiPass(
       srcCanvas, targetWidth, targetHeight,
